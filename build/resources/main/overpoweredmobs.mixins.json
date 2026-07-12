@@ -4,7 +4,9 @@
     "compatibilityLevel": "JAVA_21",
     "mixins": [
         "MobAttributesMixin",
-        "ArrowExplosionMixin"
+        "ArrowExplosionMixin",
+        "ExperienceMultiplierMixin",
+        "DropMultiplierMixin"
     ],
     "injectors": {
         "defaultRequire": 1
