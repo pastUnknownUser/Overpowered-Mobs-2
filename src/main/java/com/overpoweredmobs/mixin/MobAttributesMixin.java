@@ -2,7 +2,9 @@ package com.overpoweredmobs.mixin;
 
 import com.overpoweredmobs.OverpoweredMobs;
 import com.overpoweredmobs.config.OverpoweredConfig;
-import com.overpoweredmobs.item.OPItems;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -14,7 +16,11 @@ import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.CrossbowItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -52,7 +58,7 @@ public class MobAttributesMixin {
         if (mob.getType().getCategory() != MobCategory.MONSTER) return;
         applyBoosts();
         if (reason == EntitySpawnReason.NATURAL || reason == EntitySpawnReason.SPAWNER || reason == EntitySpawnReason.STRUCTURE) {
-            equipOPGear();
+            equipOPGear(level);
         }
     }
 
@@ -76,30 +82,43 @@ public class MobAttributesMixin {
     }
 
     @Unique
-    private void equipOPGear() {
+    private void equipOPGear(ServerLevelAccessor level) {
         Mob mob = (Mob) (Object) this;
         if (NO_EQUIP_TYPES.contains(mob.getType())) return;
 
         RandomSource random = mob.getRandom();
         if (random.nextDouble() >= OP_GEAR_CHANCE) return;
 
-        equipSlot(mob, random, EquipmentSlot.HEAD, OPItems.OP_HELMET);
-        equipSlot(mob, random, EquipmentSlot.CHEST, OPItems.OP_CHESTPLATE);
-        equipSlot(mob, random, EquipmentSlot.LEGS, OPItems.OP_LEGGINGS);
-        equipSlot(mob, random, EquipmentSlot.FEET, OPItems.OP_BOOTS);
+        HolderGetter<Enchantment> enchants = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+
+        equipSlot(mob, random, EquipmentSlot.HEAD, enchanted(enchants, Items.NETHERITE_HELMET, Enchantments.PROTECTION, 10));
+        equipSlot(mob, random, EquipmentSlot.CHEST, enchanted(enchants, Items.NETHERITE_CHESTPLATE, Enchantments.PROTECTION, 10));
+        equipSlot(mob, random, EquipmentSlot.LEGS, enchanted(enchants, Items.NETHERITE_LEGGINGS, Enchantments.PROTECTION, 10));
+        equipSlot(mob, random, EquipmentSlot.FEET, enchanted(enchants, Items.NETHERITE_BOOTS, Enchantments.PROTECTION, 10));
 
         ItemStack held = mob.getItemBySlot(EquipmentSlot.MAINHAND);
         if (held.getItem() instanceof BowItem || held.getItem() instanceof CrossbowItem) {
-            equipSlot(mob, random, EquipmentSlot.MAINHAND, OPItems.OP_BOW);
+            equipSlot(mob, random, EquipmentSlot.MAINHAND, enchanted(enchants, Items.BOW, Enchantments.POWER, 10, Enchantments.PUNCH, 3, Enchantments.FLAME, 1));
         } else {
-            equipSlot(mob, random, EquipmentSlot.MAINHAND, OPItems.OP_SWORD);
+            equipSlot(mob, random, EquipmentSlot.MAINHAND, enchanted(enchants, Items.NETHERITE_SWORD, Enchantments.SHARPNESS, 10, Enchantments.FIRE_ASPECT, 3));
         }
     }
 
     @Unique
-    private void equipSlot(Mob mob, RandomSource random, EquipmentSlot slot, net.minecraft.world.item.Item item) {
+    private ItemStack enchanted(HolderGetter<Enchantment> enchants, Item item, Object... data) {
+        ItemStack stack = new ItemStack(item);
+        for (int i = 0; i < data.length; i += 2) {
+            ResourceKey<Enchantment> key = (ResourceKey<Enchantment>) data[i];
+            int level = (int) data[i + 1];
+            stack.enchant(enchants.getOrThrow(key), level);
+        }
+        return stack;
+    }
+
+    @Unique
+    private void equipSlot(Mob mob, RandomSource random, EquipmentSlot slot, ItemStack stack) {
         if (random.nextDouble() < 0.5) return;
-        mob.setItemSlot(slot, new ItemStack(item));
+        mob.setItemSlot(slot, stack);
         mob.setGuaranteedDrop(slot);
     }
 
