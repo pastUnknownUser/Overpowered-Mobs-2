@@ -3,7 +3,8 @@
     "package": "com.overpoweredmobs.mixin",
     "compatibilityLevel": "JAVA_21",
     "mixins": [
-        "MobAttributesMixin"
+        "MobAttributesMixin",
+        "ArrowExplosionMixin"
     ],
     "injectors": {
         "defaultRequire": 1
