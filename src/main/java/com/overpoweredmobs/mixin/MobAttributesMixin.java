@@ -58,7 +58,7 @@ public class MobAttributesMixin {
         if (mob.getType().getCategory() != MobCategory.MONSTER) return;
         applyBoosts();
         if (reason == EntitySpawnReason.NATURAL || reason == EntitySpawnReason.SPAWNER || reason == EntitySpawnReason.STRUCTURE) {
-            equipOPGear(level);
+            // equipOPGear(level); // disabled for diagnostic
         }
     }
 
