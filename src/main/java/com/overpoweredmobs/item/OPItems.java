@@ -3,8 +3,10 @@ package com.overpoweredmobs.item;
 import com.overpoweredmobs.OverpoweredMobs;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -51,12 +53,14 @@ public class OPItems {
     );
 
     public static final Item OP_SWORD = new OPSwordItem(new Item.Properties()
+        .setId(ResourceKey.create(Registries.ITEM, OP_SWORD_ID))
         .sword(OP_TOOL, 30.0f, -1.0f)
         .rarity(Rarity.EPIC)
         .fireResistant()
     );
 
     public static final Item OP_BOW = new OPBowItem(new Item.Properties()
+        .setId(ResourceKey.create(Registries.ITEM, OP_BOW_ID))
         .durability(99999)
         .rarity(Rarity.EPIC)
         .fireResistant()
@@ -68,6 +72,7 @@ public class OPItems {
         -1.0f,
         net.minecraft.tags.BlockTags.MINEABLE_WITH_PICKAXE,
         new Item.Properties()
+            .setId(ResourceKey.create(Registries.ITEM, OP_PICKAXE_ID))
             .pickaxe(OP_TOOL, 20.0f, -1.0f)
             .rarity(Rarity.EPIC)
             .fireResistant()
@@ -79,6 +84,7 @@ public class OPItems {
         -1.0f,
         net.minecraft.tags.BlockTags.MINEABLE_WITH_AXE,
         new Item.Properties()
+            .setId(ResourceKey.create(Registries.ITEM, OP_AXE_ID))
             .axe(OP_TOOL, 18.0f, -1.0f)
             .rarity(Rarity.EPIC)
             .fireResistant()
@@ -90,6 +96,7 @@ public class OPItems {
         -1.0f,
         net.minecraft.tags.BlockTags.MINEABLE_WITH_SHOVEL,
         new Item.Properties()
+            .setId(ResourceKey.create(Registries.ITEM, OP_SHOVEL_ID))
             .shovel(OP_TOOL, 15.0f, -1.0f)
             .rarity(Rarity.EPIC)
             .fireResistant()
@@ -101,30 +108,35 @@ public class OPItems {
         0.0f,
         net.minecraft.tags.BlockTags.MINEABLE_WITH_HOE,
         new Item.Properties()
+            .setId(ResourceKey.create(Registries.ITEM, OP_HOE_ID))
             .hoe(OP_TOOL, 10.0f, 0.0f)
             .rarity(Rarity.EPIC)
             .fireResistant()
     );
 
     public static final Item OP_HELMET = new Item(new Item.Properties()
+        .setId(ResourceKey.create(Registries.ITEM, OP_HELMET_ID))
         .humanoidArmor(OP_ARMOR, ArmorType.HELMET)
         .rarity(Rarity.EPIC)
         .fireResistant()
     );
 
     public static final Item OP_CHESTPLATE = new Item(new Item.Properties()
+        .setId(ResourceKey.create(Registries.ITEM, OP_CHESTPLATE_ID))
         .humanoidArmor(OP_ARMOR, ArmorType.CHESTPLATE)
         .rarity(Rarity.EPIC)
         .fireResistant()
     );
 
     public static final Item OP_LEGGINGS = new Item(new Item.Properties()
+        .setId(ResourceKey.create(Registries.ITEM, OP_LEGGINGS_ID))
         .humanoidArmor(OP_ARMOR, ArmorType.LEGGINGS)
         .rarity(Rarity.EPIC)
         .fireResistant()
     );
 
     public static final Item OP_BOOTS = new Item(new Item.Properties()
+        .setId(ResourceKey.create(Registries.ITEM, OP_BOOTS_ID))
         .humanoidArmor(OP_ARMOR, ArmorType.BOOTS)
         .rarity(Rarity.EPIC)
         .fireResistant()

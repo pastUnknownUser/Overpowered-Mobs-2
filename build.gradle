@@ -35,6 +35,12 @@ jar {
     from("LICENSE") {
         rename { "${it}_${project.archivesBaseName}" }
     }
+    doLast {
+        copy {
+            from archiveFile
+            into "/Users/evanchubbuck/Movies/fabric test server/mods/"
+        }
+    }
 }
 
 publishing {
