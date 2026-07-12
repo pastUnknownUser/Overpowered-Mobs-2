@@ -29,8 +29,8 @@ public class OverpoweredMobs implements ModInitializer {
     @Override
     public void onInitialize() {
         loadConfig();
-        OPItems.register();
-        RegistryAttributeHolder.get(BuiltInRegistries.ITEM.key()).addAttribute(RegistryAttribute.OPTIONAL);
+        // OPItems.register();
+        // RegistryAttributeHolder.get(BuiltInRegistries.ITEM.key()).addAttribute(RegistryAttribute.OPTIONAL);
 
         CommandRegistrationCallback.EVENT.register((dispatcher, commandBuildContext, commandSelection) ->
             OPMCommand.register(dispatcher)
