@@ -9,14 +9,22 @@
 - **MC 26.1+ is unobfuscated** — no mappings, no remapping.
 - Use plugin ID `net.fabricmc.fabric-loom` (the LoomNoRemap variant), NOT the old `fabric-loom`.
 - No `mappings` dependency. Use `implementation` / `compileOnly` / `api` — NOT `modImplementation` / `modCompileOnly` / `modApi`.
-- No mixin config needed unless you're actually using mixins (unobfuscated code means you can use standard Java inheritance/AOP instead).
+- Mixin config needed for `@Mixin` classes (`overpoweredmobs.mixins.json`), referenced in `fabric.mod.json`.
+
+## MC 26.1 API changes vs 1.21.4
+- `ResourceLocation` → `net.minecraft.resources.Identifier` (still has `.tryParse()`, `.toString()`, etc.)
+- `MobSpawnType` → `net.minecraft.world.entity.EntitySpawnReason`
+- `Attributes.MAX_HEALTH` etc. are now `Holder<Attribute>`, passed directly to `LivingEntity.getAttribute(Holder<Attribute>)` — no conversion needed
+- `Entity.getPersistentData()` removed → use `Entity.addTag()` / `entityTags()` (scoreboard entity tags) for marking
+- `Registry.get(Identifier)` returns `Optional<Reference<T>>` — use `Registry.getValue(Identifier)` for direct `T`
+- Command registration: `CommandRegistrationCallback.EVENT.register((dispatcher, commandBuildContext, commandSelection) -> ...)` — 3 params
 
 ## Planned features
-1. **Boosted vanilla mobs** — multiply HP/damage/speed/armor/drops/XP/AI via mixin or direct override + per-mob-type JSON config
+1. **Boosted vanilla mobs** — multiply HP/damage/speed/armor/drops/XP/AI via mixin + per-mob-type JSON config
 2. **Overpowered gear** — OP Sword (area damage), OP Bow (multishot, explosive arrows), OP Armor (flight), OP Tools (5×5, instant break), custom creative tab
 3. **Commands** — `/opm` suite: `set`, `reload`, `status`, `reset`
 
 ## State
 - **Phase 1 (done)**: Build scripts, mod skeleton, verified `./gradlew build` passes.
-- **Phase 2** (next): Mob boosting via config + commands.
-- **Phase 3**: All overpowered items + creative tab.
+- **Phase 2 (done)**: Mob boosting via `MobAttributesMixin` + `OverpoweredConfig` (JSON at `config/overpoweredmobs.json`) + `/opm` commands (`set`, `reload`, `status`, `reset`).
+- **Phase 3** (next): All overpowered items + creative tab.
