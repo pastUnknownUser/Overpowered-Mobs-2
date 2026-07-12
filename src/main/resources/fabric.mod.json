@@ -1,0 +1,26 @@
+{
+    "schemaVersion": 1,
+    "id": "overpoweredmobs",
+    "version": "${version}",
+    "name": "Overpowered Mobs",
+    "description": "Boosts vanilla mobs and adds overpowered gear.",
+    "authors": [],
+    "contact": {},
+    "license": "MIT",
+    "icon": "assets/overpoweredmobs/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "com.overpoweredmobs.OverpoweredMobs"
+        ],
+        "client": [
+            "com.overpoweredmobs.OverpoweredMobsClient"
+        ]
+    },
+    "depends": {
+        "fabricloader": ">=0.19.3",
+        "minecraft": ">=26.1.2",
+        "fabric-api": ">=0.154.2",
+        "java": ">=25"
+    }
+}
