@@ -9,8 +9,11 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,13 +22,34 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Set;
+
 @Mixin(Mob.class)
 public class MobAttributesMixin {
     private static final String BOOSTED_TAG = "opm_boosted";
     private static final double OP_GEAR_CHANCE = 0.40;
 
+    private static final Set<EntityType<?>> NO_EQUIP_TYPES = Set.of(
+        EntityType.CREEPER,
+        EntityType.SPIDER,
+        EntityType.CAVE_SPIDER,
+        EntityType.SLIME,
+        EntityType.MAGMA_CUBE,
+        EntityType.ENDERMAN,
+        EntityType.SILVERFISH,
+        EntityType.ENDERMITE,
+        EntityType.BLAZE,
+        EntityType.GHAST,
+        EntityType.GUARDIAN,
+        EntityType.ELDER_GUARDIAN,
+        EntityType.WITCH,
+        EntityType.PHANTOM
+    );
+
     @Inject(method = "finalizeSpawn", at = @At("RETURN"))
     private void onFinalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason, SpawnGroupData spawnData, CallbackInfoReturnable<SpawnGroupData> cir) {
+        Mob mob = (Mob) (Object) this;
+        if (mob.getType().getCategory() != MobCategory.MONSTER) return;
         applyBoosts();
         if (reason == EntitySpawnReason.NATURAL || reason == EntitySpawnReason.SPAWNER || reason == EntitySpawnReason.STRUCTURE) {
             equipOPGear();
@@ -54,6 +78,8 @@ public class MobAttributesMixin {
     @Unique
     private void equipOPGear() {
         Mob mob = (Mob) (Object) this;
+        if (NO_EQUIP_TYPES.contains(mob.getType())) return;
+
         RandomSource random = mob.getRandom();
         if (random.nextDouble() >= OP_GEAR_CHANCE) return;
 
@@ -62,10 +88,11 @@ public class MobAttributesMixin {
         equipSlot(mob, random, EquipmentSlot.LEGS, OPItems.OP_LEGGINGS);
         equipSlot(mob, random, EquipmentSlot.FEET, OPItems.OP_BOOTS);
 
-        if (random.nextBoolean()) {
-            equipSlot(mob, random, EquipmentSlot.MAINHAND, OPItems.OP_SWORD);
-        } else {
+        ItemStack held = mob.getItemBySlot(EquipmentSlot.MAINHAND);
+        if (held.getItem() instanceof BowItem || held.getItem() instanceof CrossbowItem) {
             equipSlot(mob, random, EquipmentSlot.MAINHAND, OPItems.OP_BOW);
+        } else {
+            equipSlot(mob, random, EquipmentSlot.MAINHAND, OPItems.OP_SWORD);
         }
     }
 
