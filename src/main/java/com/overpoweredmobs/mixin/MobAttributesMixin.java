@@ -33,7 +33,7 @@ import java.util.Set;
 @Mixin(Mob.class)
 public class MobAttributesMixin {
     private static final String BOOSTED_TAG = "opm_boosted";
-    private static final double OP_GEAR_CHANCE = 0.40;
+    private static final double OP_GEAR_CHANCE = 1.0;
 
     private static final Set<EntityType<?>> NO_EQUIP_TYPES = Set.of(
         EntityType.CREEPER,
