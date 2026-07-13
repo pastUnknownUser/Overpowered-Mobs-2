@@ -31,13 +31,15 @@ Jar auto-copies to `/Users/evanchubbock/Movies/fabric test server/mods/` via `ja
 - Creeper charging: `CreeperHelper.setPowered()` via Mixin `@Accessor` on private `DATA_IS_POWERED`
 - Tags: `opm_boosted` (prevent re-boost), `opm_piñata` (prevent chain), `opm_cavalry_mount` (prevent recursive cavalry)
 - Entity lookup: `BuiltInRegistries.ENTITY_TYPE.getKey(type)` / `BuiltInRegistries.ENTITY_TYPE.getValue(Identifier)`
-- Config: `config/overpoweredmobs.json` auto-generated; `zombiePiñataChance` default **0.01**, `zombiePiñataCount` default 2
-- `EquipmentHelper.NO_EQUIP_TYPES` currently includes `EntityType.ZOMBIE` (TEMP for piñata testing)
+- Config: `config/overpoweredmobs.json` auto-generated; toggles (`enableGear`, `enableCavalry`, `enablePinata`), `dimensions` map (per-dim stat multiplier), `weapon`/`weaponEnchantments` per mob, `zombiePiñataChance` default **0.01**, `zombiePiñataCount` default 2
+- Drowned default weapon: `minecraft:trident` with `impaling: 10` (code-generated config)
+- EquipmentHelper reads `weapon`/`weaponEnchantments` from config before falling back to default Bow/Netherite Sword logic
 - `/opm set <mob> <attr> <value>` — value clamped to [0.1, 100.0]; attrs: `health`, `damage`, `speed`, `armor`, `followRange`, `xp`, `drops`
 - Debug log: `logs/overpoweredmobs.log` via `OverpoweredMobsLogger` (also has `warn()`/`error()` methods; uses `BufferedWriter` — open once, flush per write)
 - OP gear uses `setDropChance(slot, 0.0f)` — never drops from mobs
 - Piñata babies despawn after 30s via `PinataDespawnMixin` (Mob.tick HEAD, checks `tickCount > 600`); drop 0 XP and 0 natural drops
 - Piñata only triggers on player kills; 10+ zombies nearby → flat 75% chance; >1 player nearby → 3 babies instead of 2; preserves zombie subtype (Husk, Drowned, etc.)
+- Piñata activation plays `FIREWORK_ROCKET_BLAST` sound + spawns `EXPLOSION_EMITTER` and `HAPPY_VILLAGER` particles
 - Five mixins + one accessor: `MobAttributesMixin` (Mob), `ExperienceMultiplierMixin` (LivingEntity), `DropMultiplierMixin` (LivingEntity), `PinataDespawnMixin` (Mob), `CreeperAccessor` (Creeper) — mixin package `com.overpoweredmobs.mixin`
 
 ## Code Style

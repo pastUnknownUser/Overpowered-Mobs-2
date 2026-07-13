@@ -5,10 +5,13 @@ A Fabric mod for Minecraft 26.1.2 that turns hostile mobs into formidable enemie
 ## Features
 
 - **Mob Boosting** — Multiplied health, damage, speed, armor, follow range, XP, and natural drops for all hostile mobs
-- **OP Enchanted Gear** — Hostile mobs spawn with full netherite armor (Protection X) and OP weapons (Sharpness X / Power X) — gear never drops from mobs
+- **Dimension Multipliers** — Per-dimension stat scaling (e.g., nerf overworld, buff nether)
+- **OP Enchanted Gear** — Hostile mobs spawn with full netherite armor (Protection X) and OP weapons — gear never drops from mobs
+- **Custom Weapon Config** — Per-mob weapon + enchantment overrides (Drowned defaults to Trident + Impaling X)
 - **Charged Creepers** — All creepers spawn visually charged with doubled explosion radius
 - **Cavalry Mounts** — Hostile mobs can spawn riding mounts (zombie on chicken, creeper on phantom, wither skeleton on ghast)
-- **Zombie Piñata** — Zombies explode into baby zombies on death (player kills only, 1% base chance, 75% when densely packed)
+- **Zombie Piñata** — Zombies explode into baby zombies on death (player kills only, 1% base chance, 75% when densely packed) with firework sound and particle burst
+- **Feature Toggles** — `enableGear`, `enableCavalry`, `enablePinata` flags in config
 - **No Mod Required on Client** — Uses only vanilla items with enchantments; vanilla clients connect without issues
 - **Fully Configurable** — JSON config with per-mob-type overrides
 - **Commands** — `/opm` suite for runtime control
@@ -29,14 +32,23 @@ A Fabric mod for Minecraft 26.1.2 that turns hostile mobs into formidable enemie
 | XP              | 3.0×    |
 | Drops           | 2.0×    |
 
-### Per-mob overrides
+### Full config structure
 
 ```json
 {
+  "enableGear": true,
+  "enableCavalry": true,
+  "enablePinata": true,
   "defaults": { "healthMultiplier": 2.0, "damageMultiplier": 2.0, ... },
   "mobs": {
     "minecraft:zombie": { "healthMultiplier": 3.0 },
-    "minecraft:skeleton": { "speedMultiplier": 2.0 }
+    "minecraft:drowned": {
+      "weapon": "minecraft:trident",
+      "weaponEnchantments": { "minecraft:impaling": 10 }
+    }
+  },
+  "dimensions": {
+    "minecraft:the_nether": 0.5
   },
   "cavalry": [
     { "rider": "minecraft:zombie", "mount": "minecraft:chicken", "chance": 0.15, "baby": true },
