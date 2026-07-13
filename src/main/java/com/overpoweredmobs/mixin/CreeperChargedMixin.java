@@ -1,21 +1,12 @@
 package com.overpoweredmobs.mixin;
 
-import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.entity.monster.Creeper;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(Creeper.class)
 public class CreeperChargedMixin {
-
-    @Shadow
-    private static EntityDataAccessor<Boolean> DATA_IS_POWERED;
-
-    public static void setPowered(Creeper creeper) {
-        creeper.getEntityData().set(DATA_IS_POWERED, true);
-    }
 
     @ModifyArg(
         method = "explodeCreeper",

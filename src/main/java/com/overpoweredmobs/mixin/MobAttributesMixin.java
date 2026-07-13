@@ -1,5 +1,6 @@
 package com.overpoweredmobs.mixin;
 
+import com.overpoweredmobs.CreeperHelper;
 import com.overpoweredmobs.EquipmentHelper;
 import com.overpoweredmobs.OverpoweredMobs;
 import com.overpoweredmobs.OverpoweredMobsLogger;
@@ -29,7 +30,7 @@ public class MobAttributesMixin {
         OverpoweredMobs.applyBoosts(mob);
 
         if (mob instanceof Creeper creeper && creeper.getRandom().nextDouble() < 0.01) {
-            CreeperChargedMixin.setPowered(creeper);
+            CreeperHelper.setPowered(creeper);
         }
 
         if (level instanceof ServerLevel serverLevel) {
