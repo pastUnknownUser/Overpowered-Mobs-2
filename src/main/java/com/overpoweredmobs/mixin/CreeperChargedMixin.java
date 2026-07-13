@@ -10,7 +10,7 @@ public class CreeperChargedMixin {
 
     @ModifyArg(
         method = "explodeCreeper",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;explode(Lnet/minecraft/world/entity/Entity;DDDFLnet/minecraft/world/level/Level$ExplosionInteraction;)Lnet/minecraft/world/level/explosion/Explosion;"),
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;explode(Lnet/minecraft/world/entity/Entity;DDDFLnet/minecraft/world/level/Level$ExplosionInteraction;)V"),
         index = 4
     )
     private float modifyExplosionPower(float originalPower) {
