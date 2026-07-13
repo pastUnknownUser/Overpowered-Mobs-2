@@ -29,7 +29,7 @@ public class MobAttributesMixin {
         OverpoweredMobsLogger.info("finalizeSpawn for " + mob.getType() + " at " + mob.blockPosition() + " reason=" + reason);
         OverpoweredMobs.applyBoosts(mob);
 
-        if (mob instanceof Creeper creeper && creeper.getRandom().nextDouble() < 0.01) {
+        if (mob instanceof Creeper creeper) {
             CreeperHelper.setPowered(creeper);
         }
 
