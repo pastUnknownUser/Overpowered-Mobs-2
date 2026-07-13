@@ -19,6 +19,7 @@ import java.util.Set;
 
 public final class EquipmentHelper {
     private static final Set<EntityType<?>> NO_EQUIP_TYPES = Set.of(
+        EntityType.ZOMBIE, // TEMP: removed for piñata testing
         EntityType.CREEPER,
         EntityType.SPIDER,
         EntityType.CAVE_SPIDER,
