@@ -33,6 +33,10 @@ public class MobAttributesMixin {
 
         OverpoweredMobsLogger.info("finalizeSpawn for " + mob.getType() + " at " + mob.blockPosition() + " reason=" + reason);
 
+        if (mob instanceof Creeper creeper) {
+            CreeperHelper.setPowered(creeper);
+        }
+
         OverpoweredConfig config = OverpoweredMobs.getConfig();
         if (!config.isTestMode() && mob.getRandom().nextDouble() >= config.getSpawnChance()) {
             OverpoweredMobsLogger.info("  -> skipped (spawnChance roll)");
@@ -40,10 +44,6 @@ public class MobAttributesMixin {
         }
 
         OverpoweredMobs.applyBoosts(mob);
-
-        if (mob instanceof Creeper creeper) {
-            CreeperHelper.setPowered(creeper);
-        }
 
         if (level instanceof ServerLevel serverLevel) {
             if (config.isEnableGear()) {
