@@ -26,21 +26,22 @@ public final class EquipmentHelper {
     private static final Set<EntityType<?>> NO_EQUIP_TYPES = buildNoEquipTypes();
 
     private static Set<EntityType<?>> buildNoEquipTypes() {
+        var reg = BuiltInRegistries.ENTITY_TYPE;
         return Set.of(
-            EntityType.CREEPER,
-            EntityType.SPIDER,
-            EntityType.CAVE_SPIDER,
-            EntityType.SLIME,
-            EntityType.MAGMA_CUBE,
-            EntityType.ENDERMAN,
-            EntityType.SILVERFISH,
-            EntityType.ENDERMITE,
-            EntityType.BLAZE,
-            EntityType.GHAST,
-            EntityType.GUARDIAN,
-            EntityType.ELDER_GUARDIAN,
-            EntityType.WITCH,
-            EntityType.PHANTOM
+            reg.getValue(Identifier.tryParse("minecraft:creeper")),
+            reg.getValue(Identifier.tryParse("minecraft:spider")),
+            reg.getValue(Identifier.tryParse("minecraft:cave_spider")),
+            reg.getValue(Identifier.tryParse("minecraft:slime")),
+            reg.getValue(Identifier.tryParse("minecraft:magma_cube")),
+            reg.getValue(Identifier.tryParse("minecraft:enderman")),
+            reg.getValue(Identifier.tryParse("minecraft:silverfish")),
+            reg.getValue(Identifier.tryParse("minecraft:endermite")),
+            reg.getValue(Identifier.tryParse("minecraft:blaze")),
+            reg.getValue(Identifier.tryParse("minecraft:ghast")),
+            reg.getValue(Identifier.tryParse("minecraft:guardian")),
+            reg.getValue(Identifier.tryParse("minecraft:elder_guardian")),
+            reg.getValue(Identifier.tryParse("minecraft:witch")),
+            reg.getValue(Identifier.tryParse("minecraft:phantom"))
         );
     }
 
@@ -80,7 +81,9 @@ public final class EquipmentHelper {
     }
 
     private static boolean isRangedMob(EntityType<?> type) {
-        return type == EntityType.SKELETON || type == EntityType.STRAY || type == EntityType.BOGGED;
+        return type == BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.tryParse("minecraft:skeleton"))
+            || type == BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.tryParse("minecraft:stray"))
+            || type == BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.tryParse("minecraft:bogged"));
     }
 
     private static void setSlot(Mob mob, EquipmentSlot slot, ItemStack stack) {

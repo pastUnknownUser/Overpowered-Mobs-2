@@ -2,14 +2,35 @@
 
 ## Identity
 - **Mod ID**: `overpoweredmobs` · **Package**: `com.overpoweredmobs`
-- **MC**: 26.1.2 · **Fabric Loader**: 0.19.3 · **Loom**: 1.17.14 · **Fabric API**: 0.154.2+26.1.2
 - **Java**: 25 · **Version**: 1.0.3 (`mod_version` in `gradle.properties`)
+- **Build**: Multi-version via `com.replaymod.preprocess` — versions defined in `versions/`
+- **Source root**: `src/` targets current `versions/mainProject` (26.2)
 
-## Build & Deploy
-```bash
-./gradlew build
+## Multi-Version Build System
+
+### Structure
 ```
-Jar auto-copies to `/Users/evanchubbock/Movies/fabric test server/mods/` via `jar.doLast`. No test task, no test dependencies, no test directory — assume zero tests.
+versions/
+├── mainProject          — text file containing the source version (e.g. "26.2")
+├── 26.1.2/
+│   └── gradle.properties — minecraft_version=26.1.2, fabric_version=0.154.2+26.1.2
+└── 26.2/
+    └── gradle.properties — minecraft_version=26.2, fabric_version=0.154.2+26.2
+```
+
+Single shared source in `src/` — preprocessor guards (`//#if MC >= ...`) used when APIs diverge.
+
+### Build Commands
+| Command | Result |
+|---------|--------|
+| `./gradlew build` | Builds ALL version subprojects |
+| `./gradlew buildAndGather` | Builds all, collects JARs to root `build/libs/` |
+| `./gradlew :26.2:build` | Build only 26.2 |
+| `./gradlew :26.1.2:build` | Build only 26.1.2 |
+
+Output JARs: `overpoweredmobs-<version>+mc<mc_version>.jar`.
+
+Jar auto-copies to `/Users/evanchubbock/Movies/fabric test server/mods/` via `jar.doLast` in `common.gradle` (last built version wins). No test task, no test dependencies, no test directory — assume zero tests.
 
 **Auto-commit**: After every successful `./gradlew build`, inspect `git status` / `git diff` / `git log --oneline -3`, then stage all changed files and commit with a descriptive message describing what was changed.
 
