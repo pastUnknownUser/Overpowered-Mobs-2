@@ -9,6 +9,7 @@ import com.overpoweredmobs.OverpoweredMobsLogger;
 import com.overpoweredmobs.config.OverpoweredConfig;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -21,6 +22,7 @@ public class OPMCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("opm")
+            .requires(source -> source.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
             .then(Commands.literal("set")
                 .then(Commands.argument("mob", StringArgumentType.word())
                     .then(Commands.argument("attribute", StringArgumentType.word())
