@@ -26,7 +26,7 @@ public class OverpoweredMobs implements ModInitializer {
     public static final String MOD_ID = "overpoweredmobs";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final String BOOSTED_TAG = "opm_boosted";
-    public static final String PINATA_TAG = "opm_piñata";
+    public static final String PINATA_TAG = "opm_pinata";
 
     private static OverpoweredConfig config;
 
@@ -89,7 +89,7 @@ public class OverpoweredMobs implements ModInitializer {
             if (!(zombie.level() instanceof ServerLevel serverLevel)) return;
             if (!(damageSource.getEntity() instanceof ServerPlayer)) return;
 
-            double chance = config.getZombiePiñataChance();
+            double chance = config.getZombiePinataChance();
 
             AABB area = AABB.ofSize(zombie.position(), 40, 40, 40);
             int nearbyZombies = serverLevel.getEntitiesOfClass(Zombie.class, area).size();
@@ -99,7 +99,7 @@ public class OverpoweredMobs implements ModInitializer {
 
             if (!config.isTestMode() && zombie.getRandom().nextDouble() >= chance) return;
 
-            int count = config.getZombiePiñataCount();
+            int count = config.getZombiePinataCount();
             int nearbyPlayers = 0;
             for (ServerPlayer player : serverLevel.players()) {
                 if (player.distanceToSqr(zombie) < 400.0) nearbyPlayers++;
@@ -131,7 +131,7 @@ public class OverpoweredMobs implements ModInitializer {
                 30, 1.5, 1.5, 1.5, 0.5);
         });
 
-        OverpoweredMobsLogger.info("Config loaded: zombiePiñataChance=" + config.getZombiePiñataChance() + " zombiePiñataCount=" + config.getZombiePiñataCount());
+        OverpoweredMobsLogger.info("Config loaded: zombiePiñataChance=" + config.getZombiePinataChance() + " zombiePiñataCount=" + config.getZombiePinataCount());
         LOGGER.info("Overpowered Mobs initialized!");
         OverpoweredMobsLogger.info("Overpowered Mobs initialized");
     }

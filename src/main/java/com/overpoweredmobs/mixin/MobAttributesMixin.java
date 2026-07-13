@@ -32,6 +32,8 @@ public class MobAttributesMixin {
         Mob mob = (Mob) (Object) this;
         if (mob.getType().getCategory() != MobCategory.MONSTER) return;
 
+        if (mob.entityTags().contains("opm_cavalry_mount") || mob.entityTags().contains("opm_horde")) return;
+
         OverpoweredMobsLogger.info("finalizeSpawn for " + mob.getType() + " at " + mob.blockPosition() + " reason=" + reason);
 
         if (mob instanceof Creeper creeper) {
@@ -69,6 +71,7 @@ public class MobAttributesMixin {
             var follow = mob.getAttribute(Attributes.FOLLOW_RANGE);
             if (follow != null) follow.setBaseValue(follow.getBaseValue() * followMult);
         }
+        mob.addTag("opm_horde");
         OverpoweredMobsLogger.info("  -> horde speed=" + speedMult + " followRange=" + followMult);
     }
 
