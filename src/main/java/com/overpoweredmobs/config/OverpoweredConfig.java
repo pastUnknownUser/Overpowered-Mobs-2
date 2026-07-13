@@ -35,7 +35,7 @@ public class OverpoweredConfig {
         new CavalryEntry("minecraft:creeper", "minecraft:phantom", 0.03, false),
         new CavalryEntry("minecraft:wither_skeleton", "minecraft:ghast", 0.03, false)
     );
-    private double spawnChance = 1.0;
+    private double spawnChance = 0.05;
     private double zombiePiñataChance = 0.01;
     private int zombiePiñataCount = 2;
 
