@@ -1,10 +1,12 @@
 # Overpowered Mobs
 
-A Fabric mod for Minecraft 26.1.2 that turns hostile mobs into formidable enemies with boosted stats, OP enchanted gear, and charged creepers — all using only vanilla items for full vanilla client compatibility.
+A Fabric mod for Minecraft 26.1.2+ that turns hostile mobs into formidable enemies with boosted stats, OP enchanted gear, and charged creepers — all using only vanilla items for full vanilla client compatibility.
 
 ## Features
 
-- **Mob Boosting** — Multiplied health, damage, speed, armor, follow range, XP, and natural drops for all hostile mobs
+- **Mob Boosting** — Multiplied health, damage, speed, armor, follow range, and XP for all hostile mobs
+- **Dynamic Drop Multiplier** — 1.2× drops without armor, 3× drops with armor equipped
+- **Horde Mode** — Mob that fail the spawn roll get 1.3× speed + 3× follow range
 - **Dimension Multipliers** — Per-dimension stat scaling (e.g., nerf overworld, buff nether)
 - **OP Enchanted Gear** — Hostile mobs spawn with full netherite armor (Protection X) and OP weapons — gear never drops from mobs
 - **Custom Weapon Config** — Per-mob weapon + enchantment overrides (Drowned defaults to Trident + Impaling X)
@@ -14,7 +16,7 @@ A Fabric mod for Minecraft 26.1.2 that turns hostile mobs into formidable enemie
 - **Feature Toggles** — `enableGear`, `enableCavalry`, `enablePinata` flags in config
 - **No Mod Required on Client** — Uses only vanilla items with enchantments; vanilla clients connect without issues
 - **Fully Configurable** — JSON config with per-mob-type overrides
-- **Commands** — `/opm` suite for runtime control
+- **Commands** — `/opm` suite for runtime control (operator only)
 
 ## Config
 
@@ -30,7 +32,6 @@ A Fabric mod for Minecraft 26.1.2 that turns hostile mobs into formidable enemie
 | Armor           | 2.0×    |
 | Follow Range    | 2.0×    |
 | XP              | 3.0×    |
-| Drops           | 2.0×    |
 
 ### Full config structure
 
@@ -62,24 +63,28 @@ A Fabric mod for Minecraft 26.1.2 that turns hostile mobs into formidable enemie
 
 ## Commands
 
+All `/opm` commands require **operator** (moderator+) permission.
+
 | Command                        | Description                  |
 |--------------------------------|------------------------------|
 | `/opm status`                  | Show current multipliers     |
 | `/opm set <mob> <attr> <val>`  | Set a multiplier             |
 | `/opm reload`                  | Reload config from disk      |
 | `/opm reset`                   | Reset config to defaults     |
+| `/opm test`                    | Toggle test mode (100% odds) |
 
 ## Build
 
 ```bash
-./gradlew build
+./gradlew :26.1.2:build    # build for 26.1.2
+./gradlew :26.2:build       # build for 26.2
 ```
 
-Output: `build/libs/overpoweredmobs-<version>.jar`
+Output: `build/libs/overpoweredmobs-<version>+mc<mc_version>.jar`
 
 ## Requirements
 
-- Minecraft 26.1.2
+- Minecraft 26.1.2 or 26.2
 - Fabric Loader 0.19.3+
 - Fabric API 0.154.2+
 - Java 25
