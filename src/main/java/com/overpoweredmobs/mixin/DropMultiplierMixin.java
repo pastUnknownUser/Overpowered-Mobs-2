@@ -1,13 +1,14 @@
 package com.overpoweredmobs.mixin;
 
 import com.overpoweredmobs.OverpoweredMobs;
-import com.overpoweredmobs.config.OverpoweredConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,10 +26,17 @@ public class DropMultiplierMixin {
         if (!(entity instanceof Mob mob)) return;
         if (mob.entityTags().contains(OverpoweredMobs.PINATA_TAG)) return;
 
-        OverpoweredConfig config = OverpoweredMobs.getConfig();
-        OverpoweredConfig.MobConfig cfg = config.getFor(mob.getType());
-        double multiplier = cfg.dropMultiplier();
-        if (multiplier <= 1.0) return;
+        boolean hasArmor = false;
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (slot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR) {
+                ItemStack stack = mob.getItemBySlot(slot);
+                if (!stack.isEmpty()) {
+                    hasArmor = true;
+                    break;
+                }
+            }
+        }
+        double multiplier = hasArmor ? 3.0 : 1.2;
 
         double mx = entity.getX(), my = entity.getY(), mz = entity.getZ();
         for (ItemEntity item : level.getEntitiesOfClass(ItemEntity.class, entity.getBoundingBox().inflate(DROP_RADIUS))) {
