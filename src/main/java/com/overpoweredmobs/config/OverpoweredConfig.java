@@ -35,6 +35,7 @@ public class OverpoweredConfig {
         new CavalryEntry("minecraft:creeper", "minecraft:phantom", 0.03, false),
         new CavalryEntry("minecraft:wither_skeleton", "minecraft:ghast", 0.03, false)
     );
+    private double spawnChance = 1.0;
     private double zombiePiñataChance = 0.01;
     private int zombiePiñataCount = 2;
 
@@ -66,6 +67,7 @@ public class OverpoweredConfig {
     public MobConfig getDefaults() { return defaults; }
     public Map<String, MobConfig> getMobs() { return mobs; }
     public List<CavalryEntry> getCavalry() { return cavalry; }
+    public double getSpawnChance() { return spawnChance; }
     public double getZombiePiñataChance() { return zombiePiñataChance; }
     public int getZombiePiñataCount() { return zombiePiñataCount; }
 
