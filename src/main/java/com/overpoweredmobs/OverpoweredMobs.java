@@ -72,16 +72,18 @@ public class OverpoweredMobs implements ModInitializer {
         );
 
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
-            if (!(entity instanceof Zombie zombie)) return;
-            if (zombie.entityTags().contains(PINATA_TAG)) return;
-            if (!(zombie.level() instanceof ServerLevel serverLevel)) return;
+            OverpoweredMobsLogger.info("AFTER_DEATH fired for " + entity.getType() + " at " + entity.blockPosition());
+            if (!(entity instanceof Zombie zombie)) { OverpoweredMobsLogger.info("  -> not a Zombie"); return; }
+            if (zombie.entityTags().contains(PINATA_TAG)) { OverpoweredMobsLogger.info("  -> already has piñata tag"); return; }
+            if (!(zombie.level() instanceof ServerLevel serverLevel)) { OverpoweredMobsLogger.info("  -> not ServerLevel"); return; }
 
             double chance = config.getZombiePiñataChance();
-            if (zombie.getRandom().nextDouble() >= chance) return;
+            OverpoweredMobsLogger.info("  -> config zombiePiñataChance=" + chance + " zombiePiñataCount=" + config.getZombiePiñataCount());
+            if (zombie.getRandom().nextDouble() >= chance) { OverpoweredMobsLogger.info("  -> chance roll failed"); return; }
 
             int count = config.getZombiePiñataCount();
             DifficultyInstance difficulty = serverLevel.getCurrentDifficultyAt(zombie.blockPosition());
-            OverpoweredMobsLogger.info("zombie piñata! spawning " + count + " babies");
+            OverpoweredMobsLogger.info("  -> PASSED! spawning " + count + " babies");
 
             for (int i = 0; i < count; i++) {
                 Zombie baby = EntityType.ZOMBIE.create(serverLevel, EntitySpawnReason.TRIGGERED);
@@ -97,6 +99,7 @@ public class OverpoweredMobs implements ModInitializer {
             }
         });
 
+        OverpoweredMobsLogger.info("Config loaded: zombiePiñataChance=" + config.getZombiePiñataChance() + " zombiePiñataCount=" + config.getZombiePiñataCount());
         LOGGER.info("Overpowered Mobs initialized!");
         OverpoweredMobsLogger.info("Overpowered Mobs initialized");
     }
