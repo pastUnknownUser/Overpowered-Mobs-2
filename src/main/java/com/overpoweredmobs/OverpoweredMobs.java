@@ -97,7 +97,7 @@ public class OverpoweredMobs implements ModInitializer {
                 chance = 0.75;
             }
 
-            if (zombie.getRandom().nextDouble() >= chance) return;
+            if (!config.isTestMode() && zombie.getRandom().nextDouble() >= chance) return;
 
             int count = config.getZombiePiñataCount();
             int nearbyPlayers = 0;

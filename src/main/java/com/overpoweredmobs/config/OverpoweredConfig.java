@@ -26,6 +26,7 @@ public class OverpoweredConfig {
     private boolean enableGear = true;
     private boolean enableCavalry = true;
     private boolean enablePinata = true;
+    private boolean testMode = false;
     private Map<String, Double> dimensions = new HashMap<>();
     private Map<String, MobConfig> mobs = new HashMap<>(defaultMobOverrides());
     private MobConfig defaults = new MobConfig();
@@ -49,6 +50,8 @@ public class OverpoweredConfig {
     public boolean isEnableGear() { return enableGear; }
     public boolean isEnableCavalry() { return enableCavalry; }
     public boolean isEnablePinata() { return enablePinata; }
+    public boolean isTestMode() { return testMode; }
+    public void setTestMode(boolean testMode) { this.testMode = testMode; }
     public double getDimensionMultiplier(String dimensionId) { return dimensions.getOrDefault(dimensionId, 1.0); }
 
     public MobConfig getFor(EntityType<?> type) {
@@ -80,6 +83,7 @@ public class OverpoweredConfig {
     public void reset() {
         mobs.clear();
         defaults = new MobConfig();
+        testMode = false;
     }
 
     public static OverpoweredConfig load() {

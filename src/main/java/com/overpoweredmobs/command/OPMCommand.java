@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.overpoweredmobs.OverpoweredMobs;
+import com.overpoweredmobs.OverpoweredMobsLogger;
 import com.overpoweredmobs.config.OverpoweredConfig;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -31,6 +32,8 @@ public class OPMCommand {
                 .executes(OPMCommand::executeStatus))
             .then(Commands.literal("reset")
                 .executes(OPMCommand::executeReset))
+            .then(Commands.literal("test")
+                .executes(OPMCommand::executeTest))
         );
     }
 
@@ -97,6 +100,17 @@ public class OPMCommand {
         OverpoweredMobs.getConfig().save();
         ctx.getSource().sendSuccess(() ->
             Component.literal("Config reset to defaults"), true);
+        return 1;
+    }
+
+    private static int executeTest(CommandContext<CommandSourceStack> ctx) {
+        OverpoweredConfig config = OverpoweredMobs.getConfig();
+        boolean now = !config.isTestMode();
+        config.setTestMode(now);
+        config.save();
+        ctx.getSource().sendSuccess(() ->
+            Component.literal("Test mode " + (now ? "enabled" : "disabled") + " — all random chances forced to 100%"), true);
+        OverpoweredMobsLogger.info("Test mode " + (now ? "enabled" : "disabled"));
         return 1;
     }
 

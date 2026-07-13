@@ -66,7 +66,7 @@ public class MobAttributesMixin {
         String riderId = riderKey.toString();
         for (OverpoweredConfig.CavalryEntry entry : OverpoweredMobs.getConfig().getCavalry()) {
             if (!entry.rider().equals(riderId)) continue;
-            if (rider.getRandom().nextDouble() >= entry.chance()) continue;
+            if (!OverpoweredMobs.getConfig().isTestMode() && rider.getRandom().nextDouble() >= entry.chance()) continue;
 
             Identifier mountKey = Identifier.tryParse(entry.mount());
             if (mountKey == null) return;
