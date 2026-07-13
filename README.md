@@ -4,9 +4,11 @@ A Fabric mod for Minecraft 26.1.2 that turns hostile mobs into formidable enemie
 
 ## Features
 
-- **Mob Boosting** — Multiplied health, damage, speed, armor, follow range, XP, and drops for all hostile mobs
-- **OP Enchanted Gear** — Hostile mobs spawn with full netherite armor (Protection X) and OP weapons (Sharpness X / Power X)
+- **Mob Boosting** — Multiplied health, damage, speed, armor, follow range, XP, and natural drops for all hostile mobs
+- **OP Enchanted Gear** — Hostile mobs spawn with full netherite armor (Protection X) and OP weapons (Sharpness X / Power X) — gear never drops from mobs
 - **Charged Creepers** — All creepers spawn visually charged with doubled explosion radius
+- **Cavalry Mounts** — Hostile mobs can spawn riding mounts (zombie on chicken, creeper on phantom, wither skeleton on ghast)
+- **Zombie Piñata** — Zombies explode into baby zombies on death (player kills only, 1% base chance, 75% when densely packed)
 - **No Mod Required on Client** — Uses only vanilla items with enchantments; vanilla clients connect without issues
 - **Fully Configurable** — JSON config with per-mob-type overrides
 - **Commands** — `/opm` suite for runtime control
@@ -35,7 +37,14 @@ A Fabric mod for Minecraft 26.1.2 that turns hostile mobs into formidable enemie
   "mobs": {
     "minecraft:zombie": { "healthMultiplier": 3.0 },
     "minecraft:skeleton": { "speedMultiplier": 2.0 }
-  }
+  },
+  "cavalry": [
+    { "rider": "minecraft:zombie", "mount": "minecraft:chicken", "chance": 0.15, "baby": true },
+    { "rider": "minecraft:creeper", "mount": "minecraft:phantom", "chance": 0.03, "baby": false },
+    { "rider": "minecraft:wither_skeleton", "mount": "minecraft:ghast", "chance": 0.03, "baby": false }
+  ],
+  "zombiePiñataChance": 0.01,
+  "zombiePiñataCount": 2
 }
 ```
 

@@ -14,14 +14,14 @@ Every hostile mob ( `MobCategory.MONSTER` ) has its attributes multiplied on spa
 | Armor             | 2.0×              | `armorMultiplier`     |
 | Follow Range      | 2.0×              | `followRangeMultiplier`|
 | Experience        | 3.0×              | `xpMultiplier`        |
-| Drops             | 2.0×              | `dropsMultiplier`     |
+| Drops ¹           | 2.0×              | `dropsMultiplier`     |
 
 ### Implementation
 
 - **`OverpoweredConfig.java`** — Loads/saves `config/overpoweredmobs.json` with a `defaults` map and per-mob overrides.
 - **`MobAttributesMixin.java`** — Injects into `Mob.finalizeSpawn` to read config and multiply attributes via `AttributeInstance.setBaseValue()`.
 - **`ExperienceMultiplierMixin.java`** — Injects at RETURN of `LivingEntity.getExperienceReward()` to multiply XP drops.
-- **`DropMultiplierMixin.java`** — Injects after `dropAllDeathLoot()` to duplicate nearby `ItemEntity` instances for multiplied drops.
+- **`DropMultiplierMixin.java`** — Injects after `dropAllDeathLoot()` to duplicate nearby `ItemEntity` instances for multiplied natural drops only.
 - Entities are tagged with `opm_boosted` (scoreboard entity tag) to prevent re-boosting.
 
 ---
@@ -41,7 +41,7 @@ Every equippable mob gets full netherite armor:
 | Legs      | Netherite Leggings  | Protection     | X     |
 | Feet      | Netherite Boots     | Protection     | X     |
 
-All armor pieces have `setGuaranteedDrop()` enabled.
+All armor pieces have `setDropChance(slot, 0.0f)` — never drop from mobs.
 
 ### Weapons
 
@@ -60,7 +60,7 @@ Creeper, Spider, Cave Spider, Slime, Magma Cube, Enderman, Silverfish, Endermite
 
 ### Implementation
 
-- **`EquipmentHelper.java`** — Static utility that builds enchanted item stacks using the MC 26.1 data component API (`ItemEnchantments.Mutable` + `DataComponents.ENCHANTMENTS`) and calls `Mob.setItemSlot()` + `Mob.setGuaranteedDrop()`.
+- **`EquipmentHelper.java`** — Static utility that builds enchanted item stacks using the MC 26.1 data component API (`ItemEnchantments.Mutable` + `DataComponents.ENCHANTMENTS`) and calls `Mob.setItemSlot()` + `Mob.setDropChance(slot, 0.0f)`.
 - **When gear is applied** — The gear call is deferred via `MinecraftServer.execute()` to run after the entity is fully loaded into the world, preventing native equipment code from overwriting it.
 
 ---
@@ -73,6 +73,53 @@ All creepers spawn visually charged (`setPowered(true)`) with the lightning bolt
 
 - **`CreeperHelper.java`** — Uses reflection to access the private `Creeper.DATA_IS_POWERED` entity data accessor (no `setPowered()` method exists in MC 26.1).
 - Called from `MobAttributesMixin.onFinalizeSpawn` for every `Creeper` instance.
+
+---
+
+## Cavalry Mounts
+
+When a matching rider mob spawns from the `MobAttributesMixin`, it rolls each cavalry entry in the config. On a success, a mount entity is created at the same position and the rider mounts it via `startRiding(mount)`.
+
+### Default combos
+
+| Rider            | Mount     | Chance | Baby rider |
+|------------------|-----------|--------|------------|
+| Zombie           | Chicken   | 15%    | Yes        |
+| Creeper          | Phantom   | 3%     | No         |
+| Wither Skeleton  | Ghast     | 3%     | No         |
+
+### Implementation
+
+- Cavalry checks happen inside `MobAttributesMixin.trySpawnCavalry()` after gear is applied.
+- The mount gets `finalizeSpawn` called with `EntitySpawnReason.JOCKEY`, so it flows through the normal boosting/gear pipeline.
+- Mounts are tagged `opm_cavalry_mount` to prevent recursive cavalry spawning.
+- Cavalry entries are fully configurable via the `cavalry` array in `config/overpoweredmobs.json`.
+
+---
+
+## Zombie Piñata
+
+When a **player** kills a zombie, there is a chance it explodes into baby zombies.
+
+### Spawn rules
+
+| Condition | Effect |
+|-----------|--------|
+| Base chance | `zombiePiñataChance` (default 1%) |
+| ≥10 zombies within 20 blocks | Override chance to flat 75% (anti-XP-farm) |
+| >1 player within 20 blocks | Spawn 3 babies instead of default 2 |
+| Non-player kill (fall, fire, etc.) | Piñata never triggers |
+
+### Baby zombie behavior
+
+- Spawned with `opm_piñata` tag to prevent chain reactions on death.
+- **No armor** — only get the OP weapon (Netherite Sword for zombies).
+- Despawn after 30 seconds via `PinataDespawnMixin` (removed when `tickCount > 600`).
+
+### Implementation
+
+- Registered in `OverpoweredMobs.onInitialize()` via `ServerLivingEntityEvents.AFTER_DEATH`.
+- Config keys: `zombiePiñataChance` (double), `zombiePiñataCount` (int).
 
 ---
 
@@ -124,7 +171,14 @@ Auto-generated with defaults on first server start. Example:
       "healthMultiplier": 3.0,
       "damageMultiplier": 2.5
     }
-  }
+  },
+  "cavalry": [
+    { "rider": "minecraft:zombie", "mount": "minecraft:chicken", "chance": 0.15, "baby": true },
+    { "rider": "minecraft:creeper", "mount": "minecraft:phantom", "chance": 0.03, "baby": false },
+    { "rider": "minecraft:wither_skeleton", "mount": "minecraft:ghast", "chance": 0.03, "baby": false }
+  ],
+  "zombiePiñataChance": 0.01,
+  "zombiePiñataCount": 2
 }
 ```
 
@@ -158,6 +212,11 @@ All gear uses **only vanilla Minecraft items** (netherite armor, bow, netherite 
 
 | Version | Changes |
 |---------|---------|
+| 1.0.3   | Added cavalry mounts, zombie piñata, debug logger, zero-drop OP gear, piñata despawn timer, density-based and multiplayer piñata rules |
 | 1.0.2   | All creepers spawn charged; removed explosion modifier mixin |
 | 1.0.1   | Fixed gear overwrite (deferred tick); added debug logger; fixed enchantment component API; creeper 1% charge (removed in 1.0.2) |
 | 1.0.0   | Initial release: mob boosting, OP gear, commands |
+
+---
+
+¹ Natural drops only (flesh, bones, arrows, etc.). OP enchanted gear has `setDropChance(slot, 0.0f)` and never drops from mobs.
