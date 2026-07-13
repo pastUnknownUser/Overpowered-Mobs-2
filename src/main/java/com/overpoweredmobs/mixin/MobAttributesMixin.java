@@ -2,6 +2,7 @@ package com.overpoweredmobs.mixin;
 
 import com.overpoweredmobs.CreeperHelper;
 import com.overpoweredmobs.EquipmentHelper;
+import com.overpoweredmobs.FenceZoneManager;
 import com.overpoweredmobs.OverpoweredMobs;
 import com.overpoweredmobs.OverpoweredMobsLogger;
 import com.overpoweredmobs.config.OverpoweredConfig;
@@ -50,6 +51,7 @@ public class MobAttributesMixin {
         OverpoweredMobs.applyBoosts(mob);
 
         if (level instanceof ServerLevel serverLevel) {
+            FenceZoneManager.evictFromZones(mob);
             if (config.isEnableGear()) {
                 equipGear(mob, serverLevel);
             }

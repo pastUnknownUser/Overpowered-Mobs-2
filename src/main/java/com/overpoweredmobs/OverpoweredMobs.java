@@ -5,6 +5,7 @@ import com.overpoweredmobs.config.OverpoweredConfig;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -77,6 +78,7 @@ public class OverpoweredMobs implements ModInitializer {
     public void onInitialize() {
         OverpoweredMobsLogger.init(FabricLoader.getInstance().getGameDir());
         loadConfig();
+        FenceZoneManager.load();
 
         CommandRegistrationCallback.EVENT.register((dispatcher, commandBuildContext, commandSelection) ->
             OPMCommand.register(dispatcher)
@@ -130,6 +132,10 @@ public class OverpoweredMobs implements ModInitializer {
                 zombie.getX(), zombie.getY() + 1, zombie.getZ(),
                 30, 1.5, 1.5, 1.5, 0.5);
         });
+
+        PlayerBlockBreakEvents.AFTER.register((level, player, pos, state, blockEntity) ->
+            FenceZoneManager.onFenceBroken(level, pos, state)
+        );
 
         OverpoweredMobsLogger.info("Config loaded: zombiePiñataChance=" + config.getZombiePinataChance() + " zombiePiñataCount=" + config.getZombiePinataCount());
         LOGGER.info("Overpowered Mobs initialized!");
