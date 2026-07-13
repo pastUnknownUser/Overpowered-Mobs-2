@@ -66,6 +66,7 @@ public final class EquipmentHelper {
         mob.setDropChance(slot, 0.0f);
     }
 
+    @SuppressWarnings("unchecked")
     private static ItemStack enchanted(HolderGetter<Enchantment> enchants, Item item, Object... data) {
         ItemStack stack = new ItemStack(item);
         var mutable = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);

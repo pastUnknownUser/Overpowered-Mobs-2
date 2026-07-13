@@ -6,7 +6,7 @@
         "MobAttributesMixin",
         "ExperienceMultiplierMixin",
         "DropMultiplierMixin",
-        "PiñataDespawnMixin"
+        "PinataDespawnMixin"
     ],
     "injectors": {
         "defaultRequire": 1

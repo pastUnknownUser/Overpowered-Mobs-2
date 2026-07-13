@@ -34,9 +34,9 @@ Jar auto-copies to `/Users/evanchubbock/Movies/fabric test server/mods/` via `ja
 - `/opm set <mob> <attr> <value>` — value clamped to [0.1, 100.0]; attrs: `health`, `damage`, `speed`, `armor`, `followRange`, `xp`, `drops`
 - Debug log: `logs/overpoweredmobs.log` via `OverpoweredMobsLogger` (also has `warn()`/`error()` methods)
 - OP gear uses `setDropChance(slot, 0.0f)` — never drops from mobs
-- Piñata babies despawn after 30s via `PiñataDespawnMixin` (Mob.tick HEAD, checks `tickCount > 600`)
+- Piñata babies despawn after 30s via `PinataDespawnMixin` (Mob.tick HEAD, checks `tickCount > 600`)
 - Piñata only triggers on player kills; 10+ zombies nearby → flat 75% chance; >1 player nearby → 3 babies instead of 2
-- Four mixins: `MobAttributesMixin` (Mob), `ExperienceMultiplierMixin` (LivingEntity), `DropMultiplierMixin` (LivingEntity), `PiñataDespawnMixin` (Mob) — all in `com.overpoweredmobs.mixin`
+- Four mixins: `MobAttributesMixin` (Mob), `ExperienceMultiplierMixin` (LivingEntity), `DropMultiplierMixin` (LivingEntity), `PinataDespawnMixin` (Mob) — all in `com.overpoweredmobs.mixin`
 
 ## Code Style
 - No records — plain classes with explicit getters

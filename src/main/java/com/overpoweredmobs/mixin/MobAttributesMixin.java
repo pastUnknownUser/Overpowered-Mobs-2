@@ -72,7 +72,7 @@ public class MobAttributesMixin {
             if (mount == null) return;
 
             mount.setPos(rider.getX(), rider.getY(), rider.getZ());
-            mount.finalizeSpawn(level, difficulty, reason, null);
+            mount.finalizeSpawn(level, difficulty, EntitySpawnReason.JOCKEY, null);
             mount.addTag("opm_cavalry_mount");
             level.addFreshEntity(mount);
 
