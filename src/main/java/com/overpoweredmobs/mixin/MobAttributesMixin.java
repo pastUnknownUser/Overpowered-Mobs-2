@@ -38,9 +38,14 @@ public class MobAttributesMixin {
             CreeperHelper.setPowered(creeper);
         }
 
+        OverpoweredConfig config = OverpoweredMobs.getConfig();
         if (level instanceof ServerLevel serverLevel) {
-            equipGear(mob, serverLevel);
-            trySpawnCavalry(mob, serverLevel, difficulty, reason);
+            if (config.isEnableGear()) {
+                equipGear(mob, serverLevel);
+            }
+            if (config.isEnableCavalry()) {
+                trySpawnCavalry(mob, serverLevel, difficulty, reason);
+            }
         }
     }
 

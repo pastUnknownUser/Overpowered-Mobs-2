@@ -6,8 +6,11 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
@@ -43,13 +46,19 @@ public class OverpoweredMobs implements ModInitializer {
 
         EntityType<?> type = mob.getType();
         OverpoweredConfig.MobConfig cfg = config.getFor(type);
-        OverpoweredMobsLogger.info("  boosting " + type + " health=" + cfg.healthMultiplier() + " damage=" + cfg.damageMultiplier() + " speed=" + cfg.speedMultiplier());
+        double dimMult = config.getDimensionMultiplier(mob.level().dimension().identifier().toString());
+        double healthMult = cfg.healthMultiplier() * dimMult;
+        double damageMult = cfg.damageMultiplier() * dimMult;
+        double speedMult = cfg.speedMultiplier() * dimMult;
+        double armorMult = cfg.armorMultiplier() * dimMult;
+        double followRangeMult = cfg.followRangeMultiplier() * dimMult;
+        OverpoweredMobsLogger.info("  boosting " + type + " health=" + healthMult + " damage=" + damageMult + " speed=" + speedMult + " dim=" + mob.level().dimension().identifier() + " dimMult=" + dimMult);
 
-        multiplyAttribute(mob, Attributes.MAX_HEALTH, cfg.healthMultiplier());
-        multiplyAttribute(mob, Attributes.ATTACK_DAMAGE, cfg.damageMultiplier());
-        multiplyAttribute(mob, Attributes.MOVEMENT_SPEED, cfg.speedMultiplier());
-        multiplyAttribute(mob, Attributes.ARMOR, cfg.armorMultiplier());
-        multiplyAttribute(mob, Attributes.FOLLOW_RANGE, cfg.followRangeMultiplier());
+        multiplyAttribute(mob, Attributes.MAX_HEALTH, healthMult);
+        multiplyAttribute(mob, Attributes.ATTACK_DAMAGE, damageMult);
+        multiplyAttribute(mob, Attributes.MOVEMENT_SPEED, speedMult);
+        multiplyAttribute(mob, Attributes.ARMOR, armorMult);
+        multiplyAttribute(mob, Attributes.FOLLOW_RANGE, followRangeMult);
 
         mob.setHealth(mob.getMaxHealth());
         mob.addTag(BOOSTED_TAG);
@@ -74,6 +83,7 @@ public class OverpoweredMobs implements ModInitializer {
         );
 
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
+            if (!config.isEnablePinata()) return;
             if (!(entity instanceof Zombie zombie)) return;
             if (zombie.entityTags().contains(PINATA_TAG)) return;
             if (!(zombie.level() instanceof ServerLevel serverLevel)) return;
@@ -111,6 +121,14 @@ public class OverpoweredMobs implements ModInitializer {
                 baby.finalizeSpawn(serverLevel, difficulty, EntitySpawnReason.TRIGGERED, null);
                 serverLevel.addFreshEntity(baby);
             }
+
+            serverLevel.playSound(null, zombie.getX(), zombie.getY(), zombie.getZ(),
+                SoundEvents.FIREWORK_ROCKET_BLAST, SoundSource.HOSTILE, 1.0f, 1.0f);
+            serverLevel.sendParticles(ParticleTypes.EXPLOSION_EMITTER,
+                zombie.getX(), zombie.getY(), zombie.getZ(), 1, 0, 0, 0, 0);
+            serverLevel.sendParticles(ParticleTypes.HAPPY_VILLAGER,
+                zombie.getX(), zombie.getY() + 1, zombie.getZ(),
+                30, 1.5, 1.5, 1.5, 0.5);
         });
 
         OverpoweredMobsLogger.info("Config loaded: zombiePiñataChance=" + config.getZombiePiñataChance() + " zombiePiñataCount=" + config.getZombiePiñataCount());

@@ -23,7 +23,11 @@ public class OverpoweredConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("overpoweredmobs.json");
 
-    private Map<String, MobConfig> mobs = new HashMap<>();
+    private boolean enableGear = true;
+    private boolean enableCavalry = true;
+    private boolean enablePinata = true;
+    private Map<String, Double> dimensions = new HashMap<>();
+    private Map<String, MobConfig> mobs = new HashMap<>(defaultMobOverrides());
     private MobConfig defaults = new MobConfig();
     private List<CavalryEntry> cavalry = List.of(
         new CavalryEntry("minecraft:zombie", "minecraft:chicken", 0.15, true),
@@ -32,6 +36,20 @@ public class OverpoweredConfig {
     );
     private double zombiePiñataChance = 0.01;
     private int zombiePiñataCount = 2;
+
+    private static Map<String, MobConfig> defaultMobOverrides() {
+        Map<String, MobConfig> map = new HashMap<>();
+        MobConfig drowned = new MobConfig();
+        drowned.weapon = "minecraft:trident";
+        drowned.weaponEnchantments = new HashMap<>(Map.of("minecraft:impaling", 10));
+        map.put("minecraft:drowned", drowned);
+        return map;
+    }
+
+    public boolean isEnableGear() { return enableGear; }
+    public boolean isEnableCavalry() { return enableCavalry; }
+    public boolean isEnablePinata() { return enablePinata; }
+    public double getDimensionMultiplier(String dimensionId) { return dimensions.getOrDefault(dimensionId, 1.0); }
 
     public MobConfig getFor(EntityType<?> type) {
         Identifier key = BuiltInRegistries.ENTITY_TYPE.getKey(type);
@@ -102,6 +120,8 @@ public class OverpoweredConfig {
         private double xpMultiplier = 3.0;
         @SerializedName("dropsMultiplier")
         private double dropMultiplier = 2.0;
+        private String weapon;
+        private Map<String, Integer> weaponEnchantments;
 
         public double healthMultiplier() { return healthMultiplier; }
         public double damageMultiplier() { return damageMultiplier; }
@@ -110,6 +130,8 @@ public class OverpoweredConfig {
         public double followRangeMultiplier() { return followRangeMultiplier; }
         public double xpMultiplier() { return xpMultiplier; }
         public double dropMultiplier() { return dropMultiplier; }
+        public String weapon() { return weapon; }
+        public Map<String, Integer> weaponEnchantments() { return weaponEnchantments; }
 
         public void setHealthMultiplier(double v) { healthMultiplier = v; }
         public void setDamageMultiplier(double v) { damageMultiplier = v; }

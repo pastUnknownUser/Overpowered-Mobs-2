@@ -11,6 +11,8 @@
 ```
 Jar auto-copies to `/Users/evanchubbock/Movies/fabric test server/mods/` via `jar.doLast`. No test task, no test dependencies, no test directory — assume zero tests.
 
+**Auto-commit**: After every successful `./gradlew build`, inspect `git status` / `git diff` / `git log --oneline -3`, then stage all changed files and commit with a descriptive message describing what was changed.
+
 ## Critical MC 26.1 Quirks
 - **No remapping** (unobfuscated MC). Use `implementation`/`compileOnly`/`api`, NEVER `modImplementation`/`modCompileOnly`/`modApi`.
 - `ResourceLocation` → `net.minecraft.resources.Identifier` (`.tryParse()`, `.toString()`)
