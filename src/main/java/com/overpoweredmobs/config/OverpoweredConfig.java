@@ -2,6 +2,7 @@ package com.overpoweredmobs.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.overpoweredmobs.OverpoweredMobs;
 import net.fabricmc.loader.api.FabricLoader;
@@ -67,7 +68,14 @@ public class OverpoweredConfig {
         if (CONFIG_PATH.toFile().exists()) {
             try (FileReader reader = new FileReader(CONFIG_PATH.toFile())) {
                 Type type = new TypeToken<OverpoweredConfig>(){}.getType();
-                return GSON.fromJson(reader, type);
+                OverpoweredConfig config = GSON.fromJson(reader, type);
+                if (config != null) {
+                    config.defaults.clamp();
+                    for (MobConfig mc : config.mobs.values()) {
+                        mc.clamp();
+                    }
+                    return config;
+                }
             } catch (IOException e) {
                 OverpoweredMobs.LOGGER.error("Failed to load config", e);
             }
@@ -92,6 +100,7 @@ public class OverpoweredConfig {
         private double armorMultiplier = 2.0;
         private double followRangeMultiplier = 2.0;
         private double xpMultiplier = 3.0;
+        @SerializedName("dropsMultiplier")
         private double dropMultiplier = 2.0;
 
         public double healthMultiplier() { return healthMultiplier; }
@@ -109,6 +118,20 @@ public class OverpoweredConfig {
         public void setFollowRangeMultiplier(double v) { followRangeMultiplier = v; }
         public void setXpMultiplier(double v) { xpMultiplier = v; }
         public void setDropMultiplier(double v) { dropMultiplier = v; }
+
+        public void clamp() {
+            healthMultiplier = clamp(healthMultiplier);
+            damageMultiplier = clamp(damageMultiplier);
+            speedMultiplier = clamp(speedMultiplier);
+            armorMultiplier = clamp(armorMultiplier);
+            followRangeMultiplier = clamp(followRangeMultiplier);
+            xpMultiplier = clamp(xpMultiplier);
+            dropMultiplier = clamp(dropMultiplier);
+        }
+
+        private static double clamp(double v) {
+            return Math.max(0.1, Math.min(100.0, v));
+        }
 
         public void set(String attr, double value) {
             switch (attr) {

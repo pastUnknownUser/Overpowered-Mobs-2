@@ -100,7 +100,7 @@ public class OverpoweredMobs implements ModInitializer {
 
             DifficultyInstance difficulty = serverLevel.getCurrentDifficultyAt(zombie.blockPosition());
             for (int i = 0; i < count; i++) {
-                Zombie baby = EntityType.ZOMBIE.create(serverLevel, EntitySpawnReason.TRIGGERED);
+                Zombie baby = (Zombie) zombie.getType().create(serverLevel, EntitySpawnReason.TRIGGERED);
                 if (baby == null) continue;
 
                 double ox = (zombie.getRandom().nextDouble() - 0.5) * 5.0;

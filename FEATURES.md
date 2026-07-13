@@ -80,9 +80,10 @@ src/main/resources/
 | Mixin | Target | Injection point | Purpose |
 |-------|--------|----------------|---------|
 | `MobAttributesMixin` | `Mob` | `finalizeSpawn` RETURN | Boost stats, charge creepers, equip gear (deferred), spawn cavalry |
-| `ExperienceMultiplierMixin` | `LivingEntity` | `getExperienceReward` RETURN | Multiply XP by config multiplier |
-| `DropMultiplierMixin` | `LivingEntity` | `dropAllDeathLoot` RETURN | Duplicate natural item drops |
+| `ExperienceMultiplierMixin` | `LivingEntity` | `getExperienceReward` RETURN | Multiply XP by config multiplier (skips piñata-tagged) |
+| `DropMultiplierMixin` | `LivingEntity` | `dropAllDeathLoot` RETURN | Duplicate natural item drops (skips piñata-tagged) |
 | `PinataDespawnMixin` | `Mob` | `tick` HEAD | Remove piñata babies after 30s |
+| `CreeperAccessor` | `Creeper` | Accessor | Provides compile-safe access to `DATA_IS_POWERED` |
 
 ---
 
@@ -280,26 +281,23 @@ All creepers spawn visually charged with the lightning bolt aura and doubled exp
 
 ### Implementation
 
-Uses reflection because MC 26.1 **removed the `setPowered(boolean)` method** from `Creeper`. The `DATA_IS_POWERED` field is a private static `EntityDataAccessor<Boolean>`.
+Uses a Mixin `@Accessor` because MC 26.1 **removed the `setPowered(boolean)` method** from `Creeper`. The `DATA_IS_POWERED` field is a private static `EntityDataAccessor<Boolean>`.
 
 ```java
-// CreeperHelper.java — static initializer
-static {
-    try {
-        Field field = Creeper.class.getDeclaredField("DATA_IS_POWERED");
-        field.setAccessible(true);
-        DATA_IS_POWERED = (EntityDataAccessor<Boolean>) field.get(null);
-    } catch (Exception e) {
-        throw new RuntimeException("Failed to access Creeper.DATA_IS_POWERED", e);
-    }
+// CreeperAccessor.java — Mixin accessor interface
+@Mixin(Creeper.class)
+public interface CreeperAccessor {
+    @Accessor("DATA_IS_POWERED")
+    EntityDataAccessor<Boolean> getDataIsPowered();
 }
 
+// CreeperHelper.java
 public static void setPowered(Creeper creeper) {
-    creeper.getEntityData().set(DATA_IS_POWERED, true);
+    creeper.getEntityData().set(((CreeperAccessor) creeper).getDataIsPowered(), true);
 }
 ```
 
-- Reflection happens once in the static initializer (fail-fast on class load)
+- Uses Mixin `@Accessor` instead of reflection — mapping-safe across MC versions
 - Called from `MobAttributesMixin.onFinalizeSpawn` for every `Creeper` instance
 - `setPowered(true)` triggers the vanilla charged behavior (lightning aura + 6.0 explosion radius)
 
@@ -384,6 +382,7 @@ When a player kills a zombie, there is a configurable chance the zombie explodes
 | Base config | `zombiePiñataChance` (default 0.01 = 1%), `zombiePiñataCount` (default 2) |
 | ≥10 zombies within 20 blocks | Chance overridden to flat 0.75 (75%) — anti-XP-farm measure |
 | >1 player within 20 blocks | Spawn count increased to 3 instead of default |
+| Non-player kill | Piñata never triggers |
 
 ### Density check
 
@@ -417,7 +416,7 @@ if (nearbyPlayers > 1) {
 
 ```java
 for (int i = 0; i < count; i++) {
-    Zombie baby = EntityType.ZOMBIE.create(serverLevel, EntitySpawnReason.TRIGGERED);
+    Zombie baby = (Zombie) zombie.getType().create(serverLevel, EntitySpawnReason.TRIGGERED);
     if (baby == null) continue;
 
     double ox = (zombie.getRandom().nextDouble() - 0.5) * 5.0;
@@ -430,7 +429,7 @@ for (int i = 0; i < count; i++) {
 }
 ```
 
-- `EntityType.ZOMBIE.create()` with `EntitySpawnReason.TRIGGERED` — returns null if can't spawn
+- `zombie.getType().create()` with `EntitySpawnReason.TRIGGERED` — preserves zombie subtype (Husk, Drowned, Zombie Villager), returns null if can't spawn
 - Scatter: uniform random ±2.5 blocks in X and Z (5.0 * [0, 1) minus 0.5 = [-2.5, 2.5))
 - Same Y as dead zombie
 - `setBaby(true)` — baby zombie, smaller + faster + burns in daylight
@@ -442,6 +441,8 @@ for (int i = 0; i < count; i++) {
 - **Boosted stats** — they flow through `finalizeSpawn` → `MobAttributesMixin` → `applyBoosts()`, so they get the full health/damage/speed multiplier
 - **No armor** — `EquipmentHelper.equipOPGear()` checks `opm_piñata` tag and skips armor slots
 - **OP weapon** — still get the Netherite Sword (or Bow for ranged mob types, though zombies always get sword)
+- **Drop 0 XP** — `ExperienceMultiplierMixin` returns 0 when `opm_piñata` tag is present
+- **Drop 0 natural items** — `DropMultiplierMixin` skips when `opm_piñata` tag is present
 - **Despawn after 30 seconds** — `PinataDespawnMixin` checks every tick: if `tickCount > 600`, removed via `Entity.RemovalReason.DISCARDED`
 - **Cannot trigger another piñata** — `opm_piñata` tag checked in AFTER_DEATH handler
 
@@ -593,19 +594,23 @@ public static OverpoweredConfig load() {
     if (CONFIG_PATH.toFile().exists()) {
         try (FileReader reader = new FileReader(CONFIG_PATH.toFile())) {
             Type type = new TypeToken<OverpoweredConfig>(){}.getType();
-            return GSON.fromJson(reader, type);
+            OverpoweredConfig config = GSON.fromJson(reader, type);
+            if (config != null) {
+                config.defaults.clamp();
+                for (MobConfig mc : config.mobs.values()) {
+                    mc.clamp();
+                }
+                return config;
+            }
         } catch (IOException e) {
             OverpoweredMobs.LOGGER.error("Failed to load config", e);
         }
     }
-    OverpoweredConfig config = new OverpoweredConfig();
-    config.save();
-    return config;
+    ...
 }
 ```
 
-- On parse error (IOException): logs error, falls through to create defaults
-- Otherwise: creates new config with defaults and saves
+All multiplier values are clamped to **[0.1, 100.0]** after deserialization, matching the `/opm set` command bounds. This prevents hand-edited JSON with extreme values like -5 or 9999 from breaking mob attributes.
 
 ### MobConfig inner class
 
@@ -621,15 +626,17 @@ double dropMultiplier = 2.0;
 ```
 
 Config attribute name mapping (used by `/opm set`):
-| Command attribute | Config field |
-|-----------------|-------------|
-| `health` | `healthMultiplier` |
-| `damage` | `damageMultiplier` |
-| `speed` | `speedMultiplier` |
-| `armor` | `armorMultiplier` |
-| `followRange` | `followRangeMultiplier` |
-| `xp` | `xpMultiplier` |
-| `drops` | `dropMultiplier` |
+| Command attribute | Config field | JSON key |
+|-----------------|-------------|----------|
+| `health` | `healthMultiplier` | `healthMultiplier` |
+| `damage` | `damageMultiplier` | `damageMultiplier` |
+| `speed` | `speedMultiplier` | `speedMultiplier` |
+| `armor` | `armorMultiplier` | `armorMultiplier` |
+| `followRange` | `followRangeMultiplier` | `followRangeMultiplier` |
+| `xp` | `xpMultiplier` | `xpMultiplier` |
+| `drops` | `dropMultiplier` | `dropsMultiplier` (via `@SerializedName`) |
+
+Note: The Java field `dropMultiplier` maps to JSON key `dropsMultiplier` via `@SerializedName("dropsMultiplier")` for correct round-tripping with the config file.
 
 ### CavalryEntry inner class
 
@@ -677,24 +684,26 @@ public static class CavalryEntry {
 ```java
 public final class OverpoweredMobsLogger {
     private static final DateTimeFormatter TIMESTAMP = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-    private static Path logFile;
+    private static BufferedWriter writer;
 
     public static void init(Path gameDir) {
         logFile = gameDir.resolve("logs").resolve("overpoweredmobs.log");
-        // Creates parent directory, truncates existing file
+        // Creates parent directory, opens BufferedWriter (open once, reuse across writes)
     }
 
     private static void write(String level, String msg) {
-        if (logFile == null) return;  // Init failed or couldn't create dir
+        if (writer == null) return;  // Init failed or couldn't create dir
         String line = String.format("[%s] [%s] %s%n", LocalDateTime.now().format(TIMESTAMP), level, msg);
-        Files.writeString(logFile, line, StandardOpenOption.APPEND);
+        writer.write(line);
+        writer.flush();  // Flush each line so logs appear immediately
     }
 }
 ```
 
+- Uses `BufferedWriter` opened once at startup — avoids file open/close overhead on every write
+- Flushes after each line for immediate visibility
 - Log file is truncated on each server start (`TRUNCATE_EXISTING`)
-- If initialization fails (can't create logs dir), `logFile` is set to null and all writes are silently dropped
-- Each write operation opens, appends, and closes the file
+- If initialization fails (can't create logs dir), `writer` is set to null and all writes are silently dropped
 
 ### What gets logged
 
@@ -745,19 +754,20 @@ Multiplies natural item drops (flesh, bones, arrows, etc.) when a mob dies. **Do
 
 ```java
 @Unique
-private static final int DROP_RADIUS = 5;
+private static final double DROP_RADIUS = 2.0;
 
 @Inject(method = "dropAllDeathLoot", at = @At("RETURN"))
 private void afterDropAllDeathLoot(ServerLevel level, DamageSource source, CallbackInfo ci) {
     LivingEntity entity = (LivingEntity) (Object) this;
     if (!(entity instanceof Mob mob)) return;
+    if (mob.entityTags().contains(OverpoweredMobs.PINATA_TAG)) return;
 
     double multiplier = cfg.dropMultiplier();
     if (multiplier <= 1.0) return;
 
-    // Scan 5-block radius for ItemEntity instances
+    // Scan 2-block radius for freshly-dropped ItemEntity instances
     for (ItemEntity item : level.getEntitiesOfClass(ItemEntity.class, entity.getBoundingBox().inflate(DROP_RADIUS))) {
-        if (item.isAlive() && item.distanceToSqr(mx, my, mz) < DROP_RADIUS * DROP_RADIUS) {
+        if (item.isAlive() && item.hasPickUpDelay() && item.distanceToSqr(mx, my, mz) < DROP_RADIUS * DROP_RADIUS) {
             // Calculate extra count (e.g. multiplier 2.0 → duplicate 1 extra stack)
             int extraCount = (int) Math.floor(stack.getCount() * (multiplier - 1.0));
             if (extraCount > 0) {
@@ -773,8 +783,10 @@ private void afterDropAllDeathLoot(ServerLevel level, DamageSource source, Callb
 
 ### Algorithm
 
-1. After `dropAllDeathLoot()` completes, scan for `ItemEntity` within 5 blocks of mob
-2. For each item, calculate `extraCount = floor(stackSize * (multiplier - 1.0))`
+1. After `dropAllDeathLoot()` completes, scan for `ItemEntity` within **2 blocks** of mob (reduced from 5 to avoid capturing items from other sources)
+2. Only considers items with `hasPickUpDelay()` true — filters out older items that were already on the ground, preventing duplicate-dip from nearby deaths
+3. Skips mobs tagged `opm_piñata` — piñata babies drop zero natural items
+4. For each matching item, calculate `extraCount = floor(stackSize * (multiplier - 1.0))`
    - multiplier 2.0 → 1 extra copy (floor(1 * 1.0) = 1)
    - multiplier 3.0 → 2 extra copies (floor(1 * 2.0) = 2)
    - multiplier 1.5 → 0 extra if stack size is 1 (floor(1 * 0.5) = 0), 1 extra if stack size 2 (floor(2 * 0.5) = 1)

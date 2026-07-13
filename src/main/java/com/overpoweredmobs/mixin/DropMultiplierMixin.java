@@ -17,12 +17,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LivingEntity.class)
 public class DropMultiplierMixin {
     @Unique
-    private static final int DROP_RADIUS = 5;
+    private static final double DROP_RADIUS = 2.0;
 
     @Inject(method = "dropAllDeathLoot", at = @At("RETURN"))
     private void afterDropAllDeathLoot(ServerLevel level, DamageSource source, CallbackInfo ci) {
         LivingEntity entity = (LivingEntity) (Object) this;
         if (!(entity instanceof Mob mob)) return;
+        if (mob.entityTags().contains(OverpoweredMobs.PINATA_TAG)) return;
 
         OverpoweredConfig config = OverpoweredMobs.getConfig();
         OverpoweredConfig.MobConfig cfg = config.getFor(mob.getType());
@@ -31,7 +32,7 @@ public class DropMultiplierMixin {
 
         double mx = entity.getX(), my = entity.getY(), mz = entity.getZ();
         for (ItemEntity item : level.getEntitiesOfClass(ItemEntity.class, entity.getBoundingBox().inflate(DROP_RADIUS))) {
-            if (item.isAlive() && item.distanceToSqr(mx, my, mz) < DROP_RADIUS * DROP_RADIUS) {
+            if (item.isAlive() && item.hasPickUpDelay() && item.distanceToSqr(mx, my, mz) < DROP_RADIUS * DROP_RADIUS) {
                 ItemStack stack = item.getItem().copy();
                 int extraCount = (int) Math.floor(stack.getCount() * (multiplier - 1.0));
                 if (extraCount > 0) {

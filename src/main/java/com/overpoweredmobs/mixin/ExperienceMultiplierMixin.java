@@ -16,6 +16,10 @@ public class ExperienceMultiplierMixin {
     @Inject(method = "getExperienceReward", at = @At("RETURN"), cancellable = true)
     private void multiplyExperience(ServerLevel level, Entity attacker, CallbackInfoReturnable<Integer> cir) {
         if (!(((Object) this) instanceof Mob mob)) return;
+        if (mob.entityTags().contains(OverpoweredMobs.PINATA_TAG)) {
+            cir.setReturnValue(0);
+            return;
+        }
         int xp = cir.getReturnValueI();
         if (xp <= 0) return;
         OverpoweredConfig config = OverpoweredMobs.getConfig();

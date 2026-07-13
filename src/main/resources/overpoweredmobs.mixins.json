@@ -6,7 +6,8 @@
         "MobAttributesMixin",
         "ExperienceMultiplierMixin",
         "DropMultiplierMixin",
-        "PinataDespawnMixin"
+        "PinataDespawnMixin",
+        "CreeperAccessor"
     ],
     "injectors": {
         "defaultRequire": 1
