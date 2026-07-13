@@ -29,11 +29,14 @@ Jar auto-copies to `/Users/evanchubbock/Movies/fabric test server/mods/` via `ja
 - Creeper charging: `CreeperHelper.setPowered()` via reflection on private `DATA_IS_POWERED`
 - Tags: `opm_boosted` (prevent re-boost), `opm_piñata` (prevent chain), `opm_cavalry_mount` (prevent recursive cavalry)
 - Entity lookup: `BuiltInRegistries.ENTITY_TYPE.getKey(type)` / `BuiltInRegistries.ENTITY_TYPE.getValue(Identifier)`
-- Config: `config/overpoweredmobs.json` auto-generated; `zombiePiñataChance` default **1.0**, `zombiePiñataCount` default 3
+- Config: `config/overpoweredmobs.json` auto-generated; `zombiePiñataChance` default **0.01**, `zombiePiñataCount` default 2
 - `EquipmentHelper.NO_EQUIP_TYPES` currently includes `EntityType.ZOMBIE` (TEMP for piñata testing)
 - `/opm set <mob> <attr> <value>` — value clamped to [0.1, 100.0]; attrs: `health`, `damage`, `speed`, `armor`, `followRange`, `xp`, `drops`
 - Debug log: `logs/overpoweredmobs.log` via `OverpoweredMobsLogger` (also has `warn()`/`error()` methods)
-- Three mixins: `MobAttributesMixin` (Mob), `ExperienceMultiplierMixin` (LivingEntity), `DropMultiplierMixin` (LivingEntity) — all in `com.overpoweredmobs.mixin`
+- OP gear uses `setDropChance(slot, 0.0f)` — never drops from mobs
+- Piñata babies despawn after 30s via `PiñataDespawnMixin` (Mob.tick HEAD, checks `tickCount > 600`)
+- Piñata only triggers on player kills; 10+ zombies nearby → flat 75% chance; >1 player nearby → 3 babies instead of 2
+- Four mixins: `MobAttributesMixin` (Mob), `ExperienceMultiplierMixin` (LivingEntity), `DropMultiplierMixin` (LivingEntity), `PiñataDespawnMixin` (Mob) — all in `com.overpoweredmobs.mixin`
 
 ## Code Style
 - No records — plain classes with explicit getters

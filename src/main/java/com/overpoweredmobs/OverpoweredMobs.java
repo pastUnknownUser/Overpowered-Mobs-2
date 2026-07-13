@@ -7,12 +7,14 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.phys.AABB;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,19 +74,31 @@ public class OverpoweredMobs implements ModInitializer {
         );
 
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
-            OverpoweredMobsLogger.info("AFTER_DEATH fired for " + entity.getType() + " at " + entity.blockPosition());
-            if (!(entity instanceof Zombie zombie)) { OverpoweredMobsLogger.info("  -> not a Zombie"); return; }
-            if (zombie.entityTags().contains(PINATA_TAG)) { OverpoweredMobsLogger.info("  -> already has piñata tag"); return; }
-            if (!(zombie.level() instanceof ServerLevel serverLevel)) { OverpoweredMobsLogger.info("  -> not ServerLevel"); return; }
+            if (!(entity instanceof Zombie zombie)) return;
+            if (zombie.entityTags().contains(PINATA_TAG)) return;
+            if (!(zombie.level() instanceof ServerLevel serverLevel)) return;
+            if (!(damageSource.getEntity() instanceof ServerPlayer)) return;
 
             double chance = config.getZombiePiñataChance();
-            OverpoweredMobsLogger.info("  -> config zombiePiñataChance=" + chance + " zombiePiñataCount=" + config.getZombiePiñataCount());
-            if (zombie.getRandom().nextDouble() >= chance) { OverpoweredMobsLogger.info("  -> chance roll failed"); return; }
+
+            AABB area = AABB.ofSize(zombie.position(), 40, 40, 40);
+            int nearbyZombies = serverLevel.getEntitiesOfClass(Zombie.class, area).size();
+            if (nearbyZombies >= 10) {
+                chance = 0.75;
+            }
+
+            if (zombie.getRandom().nextDouble() >= chance) return;
 
             int count = config.getZombiePiñataCount();
-            DifficultyInstance difficulty = serverLevel.getCurrentDifficultyAt(zombie.blockPosition());
-            OverpoweredMobsLogger.info("  -> PASSED! spawning " + count + " babies");
+            int nearbyPlayers = 0;
+            for (ServerPlayer player : serverLevel.players()) {
+                if (player.distanceToSqr(zombie) < 400.0) nearbyPlayers++;
+            }
+            if (nearbyPlayers > 1) {
+                count = 3;
+            }
 
+            DifficultyInstance difficulty = serverLevel.getCurrentDifficultyAt(zombie.blockPosition());
             for (int i = 0; i < count; i++) {
                 Zombie baby = EntityType.ZOMBIE.create(serverLevel, EntitySpawnReason.TRIGGERED);
                 if (baby == null) continue;

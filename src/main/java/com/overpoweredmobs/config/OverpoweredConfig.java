@@ -29,8 +29,8 @@ public class OverpoweredConfig {
         new CavalryEntry("minecraft:creeper", "minecraft:phantom", 0.03, false),
         new CavalryEntry("minecraft:wither_skeleton", "minecraft:ghast", 0.03, false)
     );
-    private double zombiePiñataChance = 1.0;
-    private int zombiePiñataCount = 3;
+    private double zombiePiñataChance = 0.01;
+    private int zombiePiñataCount = 2;
 
     public MobConfig getFor(EntityType<?> type) {
         Identifier key = BuiltInRegistries.ENTITY_TYPE.getKey(type);
