@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class OverpoweredConfig {
@@ -23,6 +24,13 @@ public class OverpoweredConfig {
 
     private Map<String, MobConfig> mobs = new HashMap<>();
     private MobConfig defaults = new MobConfig();
+    private List<CavalryEntry> cavalry = List.of(
+        new CavalryEntry("minecraft:zombie", "minecraft:chicken", 0.15, true),
+        new CavalryEntry("minecraft:creeper", "minecraft:phantom", 0.03, false),
+        new CavalryEntry("minecraft:wither_skeleton", "minecraft:ghast", 0.03, false)
+    );
+    private double zombiePiñataChance = 0.001;
+    private int zombiePiñataCount = 3;
 
     public MobConfig getFor(EntityType<?> type) {
         Identifier key = BuiltInRegistries.ENTITY_TYPE.getKey(type);
@@ -33,13 +41,11 @@ public class OverpoweredConfig {
         return defaults;
     }
 
-    public MobConfig getDefaults() {
-        return defaults;
-    }
-
-    public Map<String, MobConfig> getMobs() {
-        return mobs;
-    }
+    public MobConfig getDefaults() { return defaults; }
+    public Map<String, MobConfig> getMobs() { return mobs; }
+    public List<CavalryEntry> getCavalry() { return cavalry; }
+    public double getZombiePiñataChance() { return zombiePiñataChance; }
+    public int getZombiePiñataCount() { return zombiePiñataCount; }
 
     public void setFor(EntityType<?> type, MobConfig config) {
         Identifier key = BuiltInRegistries.ENTITY_TYPE.getKey(type);
@@ -128,5 +134,26 @@ public class OverpoweredConfig {
                 default -> 1.0;
             };
         }
+    }
+
+    public static class CavalryEntry {
+        private String rider;
+        private String mount;
+        private double chance;
+        private boolean baby;
+
+        public CavalryEntry() {}
+
+        public CavalryEntry(String rider, String mount, double chance, boolean baby) {
+            this.rider = rider;
+            this.mount = mount;
+            this.chance = chance;
+            this.baby = baby;
+        }
+
+        public String rider() { return rider; }
+        public String mount() { return mount; }
+        public double chance() { return chance; }
+        public boolean baby() { return baby; }
     }
 }
