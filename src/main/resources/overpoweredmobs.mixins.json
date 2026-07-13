@@ -5,7 +5,8 @@
     "mixins": [
         "MobAttributesMixin",
         "ExperienceMultiplierMixin",
-        "DropMultiplierMixin"
+        "DropMultiplierMixin",
+        "CreeperChargedMixin"
     ],
     "injectors": {
         "defaultRequire": 1

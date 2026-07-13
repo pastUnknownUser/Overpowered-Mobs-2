@@ -2,6 +2,7 @@ package com.overpoweredmobs;
 
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -12,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 import java.util.Set;
 
@@ -63,11 +65,13 @@ public final class EquipmentHelper {
 
     private static ItemStack enchanted(HolderGetter<Enchantment> enchants, Item item, Object... data) {
         ItemStack stack = new ItemStack(item);
+        var mutable = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
         for (int i = 0; i < data.length; i += 2) {
             ResourceKey<Enchantment> key = (ResourceKey<Enchantment>) data[i];
             int level = (int) data[i + 1];
-            stack.enchant(enchants.getOrThrow(key), level);
+            mutable.set(enchants.getOrThrow(key), level);
         }
+        stack.set(DataComponents.ENCHANTMENTS, mutable.toImmutable());
         return stack;
     }
 

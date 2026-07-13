@@ -9,6 +9,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -26,6 +27,10 @@ public class MobAttributesMixin {
 
         OverpoweredMobsLogger.info("finalizeSpawn for " + mob.getType() + " at " + mob.blockPosition() + " reason=" + reason);
         OverpoweredMobs.applyBoosts(mob);
+
+        if (mob instanceof Creeper creeper && creeper.getRandom().nextDouble() < 0.01) {
+            CreeperChargedMixin.setPowered(creeper);
+        }
 
         if (level instanceof ServerLevel serverLevel) {
             equipGear(mob, serverLevel);
