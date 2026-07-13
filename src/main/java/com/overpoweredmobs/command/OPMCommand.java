@@ -96,8 +96,7 @@ public class OPMCommand {
     }
 
     private static int executeReset(CommandContext<CommandSourceStack> ctx) {
-        OverpoweredMobs.getConfig().reset();
-        OverpoweredMobs.getConfig().save();
+        OverpoweredConfig.reset();
         ctx.getSource().sendSuccess(() ->
             Component.literal("Config reset to defaults"), true);
         return 1;

@@ -14,6 +14,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -82,10 +83,13 @@ public class OverpoweredConfig {
         defaults.set(attr, value);
     }
 
-    public void reset() {
-        mobs.clear();
-        defaults = new MobConfig();
-        testMode = false;
+    public static void reset() {
+        try {
+            Files.deleteIfExists(CONFIG_PATH);
+        } catch (IOException e) {
+            OverpoweredMobs.LOGGER.error("Failed to delete config", e);
+        }
+        OverpoweredMobs.loadConfig();
     }
 
     public static OverpoweredConfig load() {
