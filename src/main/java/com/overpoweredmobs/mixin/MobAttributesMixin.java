@@ -13,6 +13,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.zombie.Zombie;
@@ -39,7 +40,8 @@ public class MobAttributesMixin {
 
         OverpoweredConfig config = OverpoweredMobs.getConfig();
         if (!config.isTestMode() && mob.getRandom().nextDouble() >= config.getSpawnChance()) {
-            OverpoweredMobsLogger.info("  -> skipped (spawnChance roll)");
+            OverpoweredMobsLogger.info("  -> horde mode (spawnChance roll failed)");
+            applyHordeBuffs(mob, config);
             return;
         }
 
@@ -53,6 +55,21 @@ public class MobAttributesMixin {
                 trySpawnCavalry(mob, serverLevel, difficulty, reason);
             }
         }
+    }
+
+    @Unique
+    private static void applyHordeBuffs(Mob mob, OverpoweredConfig config) {
+        double speedMult = config.getHordeSpeedMultiplier();
+        double followMult = config.getHordeFollowRangeMultiplier();
+        if (speedMult != 1.0) {
+            var speed = mob.getAttribute(Attributes.MOVEMENT_SPEED);
+            if (speed != null) speed.setBaseValue(speed.getBaseValue() * speedMult);
+        }
+        if (followMult != 1.0) {
+            var follow = mob.getAttribute(Attributes.FOLLOW_RANGE);
+            if (follow != null) follow.setBaseValue(follow.getBaseValue() * followMult);
+        }
+        OverpoweredMobsLogger.info("  -> horde speed=" + speedMult + " followRange=" + followMult);
     }
 
     @Unique
