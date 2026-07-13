@@ -12,5 +12,4 @@ out/
 *.swo
 *.swp
 .DS_Store
-*.adv
 *.note
