@@ -20,6 +20,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Silverfish;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.phys.AABB;
 
@@ -63,6 +64,17 @@ public class OverpoweredMobs implements ModInitializer {
         multiplyAttribute(mob, Attributes.MOVEMENT_SPEED, speedMult);
         multiplyAttribute(mob, Attributes.ARMOR, armorMult);
         multiplyAttribute(mob, Attributes.FOLLOW_RANGE, followRangeMult);
+
+        if (EquipmentHelper.isRangedMob(type)) {
+            multiplyAttribute(mob, Attributes.ATTACK_SPEED, config.getRangedAttackSpeedMultiplier());
+        }
+
+        if (type == EntityType.SILVERFISH) {
+            var speed = mob.getAttribute(Attributes.MOVEMENT_SPEED);
+            if (speed != null) {
+                speed.setBaseValue(speed.getBaseValue() * config.getSilverfishSpeedMultiplier());
+            }
+        }
 
         mob.setHealth(mob.getMaxHealth());
         mob.addTag(BOOSTED_TAG);

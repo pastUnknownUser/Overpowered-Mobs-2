@@ -55,10 +55,22 @@ public final class EquipmentHelper {
 
         boolean isPinata = mob.entityTags().contains(OverpoweredMobs.PINATA_TAG);
         if (!isPinata) {
-            setSlot(mob, EquipmentSlot.HEAD, enchanted(enchants, Items.NETHERITE_HELMET, Enchantments.PROTECTION, 10));
-            setSlot(mob, EquipmentSlot.CHEST, enchanted(enchants, Items.NETHERITE_CHESTPLATE, Enchantments.PROTECTION, 10));
-            setSlot(mob, EquipmentSlot.LEGS, enchanted(enchants, Items.NETHERITE_LEGGINGS, Enchantments.PROTECTION, 10));
-            setSlot(mob, EquipmentSlot.FEET, enchanted(enchants, Items.NETHERITE_BOOTS, Enchantments.PROTECTION, 10));
+            if (isPiglin(mob.getType())) {
+                OverpoweredConfig config = OverpoweredMobs.getConfig();
+                if (mob.getType() == EntityType.PIGLIN_BRUTE && mob.getRandom().nextDouble() >= config.getPiglinBruteGearChance()) {
+                    // skip gear for brute
+                } else {
+                    setSlot(mob, EquipmentSlot.HEAD, enchanted(enchants, Items.GOLDEN_HELMET, Enchantments.PROTECTION, 10));
+                    setSlot(mob, EquipmentSlot.CHEST, enchanted(enchants, Items.GOLDEN_CHESTPLATE, Enchantments.PROTECTION, 10));
+                    setSlot(mob, EquipmentSlot.LEGS, enchanted(enchants, Items.GOLDEN_LEGGINGS, Enchantments.PROTECTION, 10));
+                    setSlot(mob, EquipmentSlot.FEET, enchanted(enchants, Items.GOLDEN_BOOTS, Enchantments.PROTECTION, 10));
+                }
+            } else {
+                setSlot(mob, EquipmentSlot.HEAD, enchanted(enchants, Items.NETHERITE_HELMET, Enchantments.PROTECTION, 10));
+                setSlot(mob, EquipmentSlot.CHEST, enchanted(enchants, Items.NETHERITE_CHESTPLATE, Enchantments.PROTECTION, 10));
+                setSlot(mob, EquipmentSlot.LEGS, enchanted(enchants, Items.NETHERITE_LEGGINGS, Enchantments.PROTECTION, 10));
+                setSlot(mob, EquipmentSlot.FEET, enchanted(enchants, Items.NETHERITE_BOOTS, Enchantments.PROTECTION, 10));
+            }
         }
 
         OverpoweredConfig.MobConfig cfg = OverpoweredMobs.getConfig().getFor(mob.getType());
@@ -83,8 +95,16 @@ public final class EquipmentHelper {
         }
     }
 
-    private static boolean isRangedMob(EntityType<?> type) {
-        return type == EntityType.SKELETON || type == EntityType.STRAY || type == EntityType.BOGGED;
+    private static final Set<EntityType<?>> PIGLIN_TYPES = Set.of(
+        EntityType.PIGLIN, EntityType.PIGLIN_BRUTE, EntityType.ZOMBIFIED_PIGLIN
+    );
+
+    public static boolean isRangedMob(EntityType<?> type) {
+        return type == EntityType.SKELETON || type == EntityType.STRAY || type == EntityType.BOGGED || type == EntityType.PARCHED;
+    }
+
+    public static boolean isPiglin(EntityType<?> type) {
+        return PIGLIN_TYPES.contains(type);
     }
 
     private static void setSlot(Mob mob, EquipmentSlot slot, ItemStack stack) {

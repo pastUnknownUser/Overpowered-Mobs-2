@@ -37,13 +37,28 @@ public class OverpoweredConfig {
     private double aggroFollowRange = 128.0;
     private double aggroSpeedMultiplier = 3.0;
     private double aggroSlowRange = 10.0;
+    private double rangedAttackSpeedMultiplier = 2.0;
+    private double ghastExplosionMultiplier = 3.0;
+    private double piglinBruteGearChance = 0.5;
+    private double silverfishSpeedMultiplier = 2.0;
+    private double shulkerLevitationDurationMultiplier = 2.0;
+    private boolean enableEvilBunnies = true;
+    private boolean enablePiglinHive = true;
+    private double piglinHiveChance = 0.01;
+    private double piglinHiveRange = 32.0;
+    private boolean enableStrongholdMobs = true;
+    private int strongholdMobCount = 8;
     private Map<String, Double> dimensions = new HashMap<>();
     private Map<String, MobConfig> mobs = new HashMap<>(defaultMobOverrides());
     private MobConfig defaults = new MobConfig();
     private List<CavalryEntry> cavalry = List.of(
         new CavalryEntry("minecraft:zombie", "minecraft:chicken", 0.15, true),
         new CavalryEntry("minecraft:creeper", "minecraft:phantom", 0.03, false),
-        new CavalryEntry("minecraft:wither_skeleton", "minecraft:ghast", 0.03, false)
+        new CavalryEntry("minecraft:wither_skeleton", "minecraft:ghast", 0.03, false),
+        new CavalryEntry("minecraft:skeleton", "minecraft:skeleton_horse", 0.2, false),
+        new CavalryEntry("minecraft:stray", "minecraft:skeleton_horse", 0.2, false),
+        new CavalryEntry("minecraft:bogged", "minecraft:skeleton_horse", 0.2, false),
+        new CavalryEntry("minecraft:parched", "minecraft:skeleton_horse", 0.2, false)
     );
     private double spawnChance = 0.05;
     private double hordeSpeedMultiplier = 1.3;
@@ -60,6 +75,11 @@ public class OverpoweredConfig {
         drowned.weapon = "minecraft:trident";
         drowned.weaponEnchantments = new HashMap<>(Map.of("minecraft:impaling", 10));
         map.put("minecraft:drowned", drowned);
+
+        MobConfig pillager = new MobConfig();
+        pillager.spawnChance = 0.15;
+        map.put("minecraft:pillager", pillager);
+
         return map;
     }
 
@@ -77,6 +97,17 @@ public class OverpoweredConfig {
     public double getAggroFollowRange() { return aggroFollowRange; }
     public double getAggroSpeedMultiplier() { return aggroSpeedMultiplier; }
     public double getAggroSlowRange() { return aggroSlowRange; }
+    public double getRangedAttackSpeedMultiplier() { return rangedAttackSpeedMultiplier; }
+    public double getGhastExplosionMultiplier() { return ghastExplosionMultiplier; }
+    public double getPiglinBruteGearChance() { return piglinBruteGearChance; }
+    public double getSilverfishSpeedMultiplier() { return silverfishSpeedMultiplier; }
+    public double getShulkerLevitationDurationMultiplier() { return shulkerLevitationDurationMultiplier; }
+    public boolean isEnableEvilBunnies() { return enableEvilBunnies; }
+    public boolean isEnablePiglinHive() { return enablePiglinHive; }
+    public double getPiglinHiveChance() { return piglinHiveChance; }
+    public double getPiglinHiveRange() { return piglinHiveRange; }
+    public boolean isEnableStrongholdMobs() { return enableStrongholdMobs; }
+    public int getStrongholdMobCount() { return strongholdMobCount; }
     public double getDimensionMultiplier(String dimensionId) { return dimensions.getOrDefault(dimensionId, 1.0); }
 
     public MobConfig getFor(EntityType<?> type) {
@@ -86,6 +117,15 @@ public class OverpoweredConfig {
             if (specific != null) return specific;
         }
         return defaults;
+    }
+
+    public double getSpawnChanceFor(EntityType<?> type) {
+        Identifier key = BuiltInRegistries.ENTITY_TYPE.getKey(type);
+        if (key != null) {
+            MobConfig specific = mobs.get(key.toString());
+            if (specific != null && specific.spawnChance >= 0) return specific.spawnChance;
+        }
+        return spawnChance;
     }
 
     public MobConfig getDefaults() { return defaults; }
@@ -155,6 +195,7 @@ public class OverpoweredConfig {
         private double xpMultiplier = 3.0;
         @SerializedName("dropsMultiplier")
         private double dropMultiplier = 2.0;
+        private double spawnChance = -1.0;
         private String weapon;
         private Map<String, Integer> weaponEnchantments;
 
@@ -199,6 +240,7 @@ public class OverpoweredConfig {
                 case "followRange" -> followRangeMultiplier = value;
                 case "xp" -> xpMultiplier = value;
                 case "drops" -> dropMultiplier = value;
+                case "spawnchance" -> spawnChance = value;
             }
         }
 
@@ -211,6 +253,7 @@ public class OverpoweredConfig {
                 case "followRange" -> followRangeMultiplier;
                 case "xp" -> xpMultiplier;
                 case "drops" -> dropMultiplier;
+                case "spawnchance" -> spawnChance;
                 default -> 1.0;
             };
         }

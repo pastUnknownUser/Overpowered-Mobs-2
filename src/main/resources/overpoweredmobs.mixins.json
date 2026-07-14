@@ -10,10 +10,18 @@
         "CreeperAccessor",
         "FencePlacementMixin",
         "FenceGuardMixin",
-        "AggroSpeedMixin"
+        "AggroSpeedMixin",
+        "LargeFireballMixin",
+        "GhastChargeMixin",
+        "PiglinHiveMixin",
+        "ShulkerBulletMixin",
+        "RabbitMixin",
+        "StrongholdMobTriggerMixin",
+        "GiantAIMixin"
     ],
     "accessors": [
-        "MobAccessor"
+        "MobAccessor",
+        "LargeFireballAccessor"
     ],
     "injectors": {
         "defaultRequire": 1

@@ -48,7 +48,8 @@ public class MobAttributesMixin {
                 CreeperHelper.setPowered(creeper);
             }
         }
-        if (!config.isTestMode() && mob.getRandom().nextDouble() >= config.getSpawnChance()) {
+        double effectiveSpawnChance = config.getSpawnChanceFor(mob.getType());
+        if (!config.isTestMode() && mob.getRandom().nextDouble() >= effectiveSpawnChance) {
             OverpoweredMobsLogger.info("  -> horde mode (spawnChance roll failed)");
             applyHordeBuffs(mob, config);
             return;
