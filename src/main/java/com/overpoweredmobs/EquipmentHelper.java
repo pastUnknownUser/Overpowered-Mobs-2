@@ -44,8 +44,12 @@ public final class EquipmentHelper {
         );
     }
 
+    public static boolean isEquippable(EntityType<?> type) {
+        return !NO_EQUIP_TYPES.contains(type);
+    }
+
     public static void equipOPGear(Mob mob, RegistryAccess registryAccess) {
-        if (NO_EQUIP_TYPES.contains(mob.getType())) return;
+        if (!isEquippable(mob.getType())) return;
 
         HolderGetter<Enchantment> enchants = registryAccess.lookupOrThrow(Registries.ENCHANTMENT);
 

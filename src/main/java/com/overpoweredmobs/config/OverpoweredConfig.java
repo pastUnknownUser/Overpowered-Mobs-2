@@ -28,6 +28,15 @@ public class OverpoweredConfig {
     private boolean enableCavalry = true;
     private boolean enablePinata = true;
     private boolean testMode = false;
+    private boolean enableBossBar = true;
+    private double bossBarRange = 32.0;
+    private boolean enableMobNames = true;
+    private boolean enableAlertSound = true;
+    private double chargedCreeperChance = 0.2;
+    private boolean enableAggro = true;
+    private double aggroFollowRange = 128.0;
+    private double aggroSpeedMultiplier = 3.0;
+    private double aggroSlowRange = 10.0;
     private Map<String, Double> dimensions = new HashMap<>();
     private Map<String, MobConfig> mobs = new HashMap<>(defaultMobOverrides());
     private MobConfig defaults = new MobConfig();
@@ -59,6 +68,15 @@ public class OverpoweredConfig {
     public boolean isEnablePinata() { return enablePinata; }
     public boolean isTestMode() { return testMode; }
     public void setTestMode(boolean testMode) { this.testMode = testMode; }
+    public boolean isEnableBossBar() { return enableBossBar; }
+    public double getBossBarRange() { return bossBarRange; }
+    public boolean isEnableMobNames() { return enableMobNames; }
+    public boolean isEnableAlertSound() { return enableAlertSound; }
+    public double getChargedCreeperChance() { return chargedCreeperChance; }
+    public boolean isEnableAggro() { return enableAggro; }
+    public double getAggroFollowRange() { return aggroFollowRange; }
+    public double getAggroSpeedMultiplier() { return aggroSpeedMultiplier; }
+    public double getAggroSlowRange() { return aggroSlowRange; }
     public double getDimensionMultiplier(String dimensionId) { return dimensions.getOrDefault(dimensionId, 1.0); }
 
     public MobConfig getFor(EntityType<?> type) {

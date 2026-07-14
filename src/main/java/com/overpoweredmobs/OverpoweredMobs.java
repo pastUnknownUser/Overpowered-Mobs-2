@@ -6,8 +6,11 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -63,7 +66,27 @@ public class OverpoweredMobs implements ModInitializer {
 
         mob.setHealth(mob.getMaxHealth());
         mob.addTag(BOOSTED_TAG);
+
+        if (config.isEnableMobNames()) {
+            mob.setCustomName(Component.literal("\u00A7c\u26A1 Overpowered ").append(mob.getType().getDescription()));
+            mob.setCustomNameVisible(true);
+        }
+
+        if (config.isEnableAggro()) {
+            var follow = mob.getAttribute(Attributes.FOLLOW_RANGE);
+            if (follow != null) {
+                follow.setBaseValue(config.getAggroFollowRange());
+            }
+        }
+
         OverpoweredMobsLogger.info("  -> boosted, health=" + mob.getHealth() + " maxHealth=" + mob.getMaxHealth());
+    }
+
+    public static boolean isHostileNearby(ServerLevel level, Mob mob, double rangeSq) {
+        for (ServerPlayer player : level.players()) {
+            if (player.distanceToSqr(mob) < rangeSq) return true;
+        }
+        return false;
     }
 
     private static void multiplyAttribute(Mob mob, net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute, double multiplier) {
@@ -136,6 +159,14 @@ public class OverpoweredMobs implements ModInitializer {
         PlayerBlockBreakEvents.AFTER.register((level, player, pos, state, blockEntity) ->
             FenceZoneManager.onFenceBroken(level, pos, state)
         );
+
+        ServerTickEvents.START_LEVEL_TICK.register(BossBarManager::onWorldTick);
+
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            if (handler.getPlayer() instanceof ServerPlayer player) {
+                BossBarManager.onPlayerDisconnect(player);
+            }
+        });
 
         OverpoweredMobsLogger.info("Config loaded: zombiePiñataChance=" + config.getZombiePinataChance() + " zombiePiñataCount=" + config.getZombiePinataCount());
         LOGGER.info("Overpowered Mobs initialized!");

@@ -1,6 +1,8 @@
 package com.overpoweredmobs.mixin;
 
+import com.overpoweredmobs.CavalryAIGoal;
 import com.overpoweredmobs.CreeperHelper;
+import com.overpoweredmobs.mixin.MobAccessor;
 import com.overpoweredmobs.EquipmentHelper;
 import com.overpoweredmobs.FenceZoneManager;
 import com.overpoweredmobs.OverpoweredMobs;
@@ -9,6 +11,8 @@ import com.overpoweredmobs.config.OverpoweredConfig;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
@@ -37,11 +41,13 @@ public class MobAttributesMixin {
 
         OverpoweredMobsLogger.info("finalizeSpawn for " + mob.getType() + " at " + mob.blockPosition() + " reason=" + reason);
 
-        if (mob instanceof Creeper creeper) {
-            CreeperHelper.setPowered(creeper);
-        }
-
         OverpoweredConfig config = OverpoweredMobs.getConfig();
+
+        if (mob instanceof Creeper creeper) {
+            if (config.isTestMode() || mob.getRandom().nextDouble() < config.getChargedCreeperChance()) {
+                CreeperHelper.setPowered(creeper);
+            }
+        }
         if (!config.isTestMode() && mob.getRandom().nextDouble() >= config.getSpawnChance()) {
             OverpoweredMobsLogger.info("  -> horde mode (spawnChance roll failed)");
             applyHordeBuffs(mob, config);
@@ -52,6 +58,15 @@ public class MobAttributesMixin {
 
         if (level instanceof ServerLevel serverLevel) {
             FenceZoneManager.evictFromZones(mob);
+
+            if (config.isEnableAlertSound() && EquipmentHelper.isEquippable(mob.getType())) {
+                double rangeSq = config.getBossBarRange() * config.getBossBarRange();
+                if (OverpoweredMobs.isHostileNearby(serverLevel, mob, rangeSq)) {
+                    serverLevel.playSound(null, mob.getX(), mob.getY(), mob.getZ(),
+                        SoundEvents.WITHER_SPAWN, SoundSource.HOSTILE, 1.0f, 1.0f);
+                }
+            }
+
             if (config.isEnableGear()) {
                 equipGear(mob, serverLevel);
             }
@@ -114,6 +129,7 @@ public class MobAttributesMixin {
             }
 
             rider.startRiding(mount);
+            ((MobAccessor) mount).getGoalSelector().addGoal(1, new CavalryAIGoal(rider, mount));
             OverpoweredMobsLogger.info("  -> cavalry: " + riderId + " riding " + entry.mount());
             return;
         }

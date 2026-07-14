@@ -9,7 +9,11 @@
         "PinataDespawnMixin",
         "CreeperAccessor",
         "FencePlacementMixin",
-        "FenceGuardMixin"
+        "FenceGuardMixin",
+        "AggroSpeedMixin"
+    ],
+    "accessors": [
+        "MobAccessor"
     ],
     "injectors": {
         "defaultRequire": 1
