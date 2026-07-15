@@ -49,6 +49,7 @@ public class OverpoweredConfig {
     private boolean enableStrongholdMobs = true;
     private int strongholdMobCount = 8;
     private boolean enableAngryWolves = true;
+    private boolean enableWaterEndermen = true;
     private Map<String, Double> dimensions = new HashMap<>();
     private Map<String, MobConfig> mobs = new HashMap<>(defaultMobOverrides());
     private MobConfig defaults = new MobConfig();
@@ -114,6 +115,7 @@ public class OverpoweredConfig {
     public boolean isEnableStrongholdMobs() { return enableStrongholdMobs; }
     public int getStrongholdMobCount() { return strongholdMobCount; }
     public boolean isEnableAngryWolves() { return enableAngryWolves; }
+    public boolean isEnableWaterEndermen() { return enableWaterEndermen; }
     public double getDimensionMultiplier(String dimensionId) { return dimensions.getOrDefault(dimensionId, 1.0); }
 
     public MobConfig getFor(EntityType<?> type) {
