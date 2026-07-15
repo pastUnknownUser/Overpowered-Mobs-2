@@ -17,11 +17,14 @@
         "ShulkerBulletMixin",
         "RabbitMixin",
         "StrongholdMobTriggerMixin",
-        "GiantAIMixin"
+        "GiantAIMixin",
+        "WolfMixin",
+        "IronGolemMixin"
     ],
     "accessors": [
         "MobAccessor",
-        "LargeFireballAccessor"
+        "LargeFireballAccessor",
+        "WolfAccessor"
     ],
     "injectors": {
         "defaultRequire": 1

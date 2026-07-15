@@ -44,10 +44,12 @@ public class OverpoweredConfig {
     private double shulkerLevitationDurationMultiplier = 2.0;
     private boolean enableEvilBunnies = true;
     private boolean enablePiglinHive = true;
-    private double piglinHiveChance = 0.01;
+    private double piglinHiveChance = 0.1;
     private double piglinHiveRange = 32.0;
     private boolean enableStrongholdMobs = true;
     private int strongholdMobCount = 8;
+    private boolean enableAngryWolves = true;
+    private boolean enableAngryGolems = true;
     private Map<String, Double> dimensions = new HashMap<>();
     private Map<String, MobConfig> mobs = new HashMap<>(defaultMobOverrides());
     private MobConfig defaults = new MobConfig();
@@ -80,6 +82,10 @@ public class OverpoweredConfig {
         pillager.spawnChance = 0.15;
         map.put("minecraft:pillager", pillager);
 
+        MobConfig creeper = new MobConfig();
+        creeper.spawnChance = 0.2;
+        map.put("minecraft:creeper", creeper);
+
         return map;
     }
 
@@ -108,6 +114,8 @@ public class OverpoweredConfig {
     public double getPiglinHiveRange() { return piglinHiveRange; }
     public boolean isEnableStrongholdMobs() { return enableStrongholdMobs; }
     public int getStrongholdMobCount() { return strongholdMobCount; }
+    public boolean isEnableAngryWolves() { return enableAngryWolves; }
+    public boolean isEnableAngryGolems() { return enableAngryGolems; }
     public double getDimensionMultiplier(String dimensionId) { return dimensions.getOrDefault(dimensionId, 1.0); }
 
     public MobConfig getFor(EntityType<?> type) {
