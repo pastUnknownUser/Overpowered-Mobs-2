@@ -20,7 +20,6 @@
         "EndermanMixin"
     ],
     "accessors": [
-        "MobAccessor",
         "LargeFireballAccessor"
     ],
     "injectors": {

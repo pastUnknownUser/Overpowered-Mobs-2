@@ -2,7 +2,6 @@ package com.overpoweredmobs.mixin;
 
 import com.overpoweredmobs.CavalryAIGoal;
 import com.overpoweredmobs.CreeperHelper;
-import com.overpoweredmobs.mixin.MobAccessor;
 import com.overpoweredmobs.EquipmentHelper;
 import com.overpoweredmobs.OverpoweredMobs;
 import com.overpoweredmobs.OverpoweredMobsLogger;
@@ -128,7 +127,7 @@ public class MobAttributesMixin {
             }
 
             rider.startRiding(mount);
-            ((MobAccessor) mount).getGoalSelector().addGoal(1, new CavalryAIGoal(rider, mount));
+            mount.getGoalSelector().addGoal(1, new CavalryAIGoal(rider, mount));
             OverpoweredMobsLogger.info("  -> cavalry: " + riderId + " riding " + entry.mount());
             return;
         }
