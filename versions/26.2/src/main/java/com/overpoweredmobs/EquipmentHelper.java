@@ -25,37 +25,66 @@ import java.util.Set;
 public final class EquipmentHelper {
     private static final Set<EntityType<?>> NO_EQUIP_TYPES = buildNoEquipTypes();
 
+    private static EntityType<?> et(String id) {
+        return BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.tryParse(id));
+    }
+
     private static Set<EntityType<?>> buildNoEquipTypes() {
-        var reg = BuiltInRegistries.ENTITY_TYPE;
         return Set.of(
-            reg.getValue(Identifier.tryParse("minecraft:creeper")),
-            reg.getValue(Identifier.tryParse("minecraft:spider")),
-            reg.getValue(Identifier.tryParse("minecraft:cave_spider")),
-            reg.getValue(Identifier.tryParse("minecraft:slime")),
-            reg.getValue(Identifier.tryParse("minecraft:magma_cube")),
-            reg.getValue(Identifier.tryParse("minecraft:enderman")),
-            reg.getValue(Identifier.tryParse("minecraft:silverfish")),
-            reg.getValue(Identifier.tryParse("minecraft:endermite")),
-            reg.getValue(Identifier.tryParse("minecraft:blaze")),
-            reg.getValue(Identifier.tryParse("minecraft:ghast")),
-            reg.getValue(Identifier.tryParse("minecraft:guardian")),
-            reg.getValue(Identifier.tryParse("minecraft:elder_guardian")),
-            reg.getValue(Identifier.tryParse("minecraft:witch")),
-            reg.getValue(Identifier.tryParse("minecraft:phantom"))
+            et("minecraft:creeper"),
+            et("minecraft:spider"),
+            et("minecraft:cave_spider"),
+            et("minecraft:slime"),
+            et("minecraft:magma_cube"),
+            et("minecraft:enderman"),
+            et("minecraft:silverfish"),
+            et("minecraft:endermite"),
+            et("minecraft:blaze"),
+            et("minecraft:ghast"),
+            et("minecraft:guardian"),
+            et("minecraft:elder_guardian"),
+            et("minecraft:witch"),
+            et("minecraft:phantom")
         );
     }
 
+    public static boolean isEquippable(EntityType<?> type) {
+        return !NO_EQUIP_TYPES.contains(type);
+    }
+
+    private static final Set<EntityType<?>> PIGLIN_TYPES = Set.of(
+        et("minecraft:piglin"),
+        et("minecraft:piglin_brute"),
+        et("minecraft:zombified_piglin")
+    );
+
+    public static boolean isPiglin(EntityType<?> type) {
+        return PIGLIN_TYPES.contains(type);
+    }
+
     public static void equipOPGear(Mob mob, RegistryAccess registryAccess) {
-        if (NO_EQUIP_TYPES.contains(mob.getType())) return;
+        if (!isEquippable(mob.getType())) return;
 
         HolderGetter<Enchantment> enchants = registryAccess.lookupOrThrow(Registries.ENCHANTMENT);
 
         boolean isPinata = mob.entityTags().contains(OverpoweredMobs.PINATA_TAG);
         if (!isPinata) {
-            setSlot(mob, EquipmentSlot.HEAD, enchanted(enchants, Items.NETHERITE_HELMET, Enchantments.PROTECTION, 10));
-            setSlot(mob, EquipmentSlot.CHEST, enchanted(enchants, Items.NETHERITE_CHESTPLATE, Enchantments.PROTECTION, 10));
-            setSlot(mob, EquipmentSlot.LEGS, enchanted(enchants, Items.NETHERITE_LEGGINGS, Enchantments.PROTECTION, 10));
-            setSlot(mob, EquipmentSlot.FEET, enchanted(enchants, Items.NETHERITE_BOOTS, Enchantments.PROTECTION, 10));
+            if (isPiglin(mob.getType())) {
+                OverpoweredConfig config = OverpoweredMobs.getConfig();
+                if (mob.getType() == et("minecraft:piglin_brute") && mob.getRandom().nextDouble() >= config.getPiglinBruteGearChance()) {
+                    // skip gear for brute
+                } else {
+                    setSlot(mob, EquipmentSlot.HEAD, enchanted(enchants, Items.GOLDEN_HELMET, Enchantments.PROTECTION, 10));
+                    setSlot(mob, EquipmentSlot.CHEST, enchanted(enchants, Items.GOLDEN_CHESTPLATE, Enchantments.PROTECTION, 10));
+                    setSlot(mob, EquipmentSlot.LEGS, enchanted(enchants, Items.GOLDEN_LEGGINGS, Enchantments.PROTECTION, 10));
+                    setSlot(mob, EquipmentSlot.FEET, enchanted(enchants, Items.GOLDEN_BOOTS, Enchantments.PROTECTION, 10));
+                }
+            } else {
+                setSlot(mob, EquipmentSlot.HEAD, enchanted(enchants, Items.NETHERITE_HELMET, Enchantments.PROTECTION, 10));
+                setSlot(mob, EquipmentSlot.CHEST, enchanted(enchants, Items.NETHERITE_CHESTPLATE, Enchantments.PROTECTION, 10));
+                setSlot(mob, EquipmentSlot.LEGS, enchanted(enchants, Items.NETHERITE_LEGGINGS, Enchantments.PROTECTION, 10));
+                setSlot(mob, EquipmentSlot.FEET, enchanted(enchants, Items.NETHERITE_BOOTS, Enchantments.PROTECTION, 10));
+            }
         }
 
         OverpoweredConfig.MobConfig cfg = OverpoweredMobs.getConfig().getFor(mob.getType());
@@ -80,10 +109,11 @@ public final class EquipmentHelper {
         }
     }
 
-    private static boolean isRangedMob(EntityType<?> type) {
-        return type == BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.tryParse("minecraft:skeleton"))
-            || type == BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.tryParse("minecraft:stray"))
-            || type == BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.tryParse("minecraft:bogged"));
+    public static boolean isRangedMob(EntityType<?> type) {
+        return type == et("minecraft:skeleton")
+            || type == et("minecraft:stray")
+            || type == et("minecraft:bogged")
+            || type == et("minecraft:parched");
     }
 
     private static void setSlot(Mob mob, EquipmentSlot slot, ItemStack stack) {

@@ -10,7 +10,9 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -69,7 +71,7 @@ public class OverpoweredMobs implements ModInitializer {
             multiplyAttribute(mob, Attributes.ATTACK_SPEED, config.getRangedAttackSpeedMultiplier());
         }
 
-        if (type == EntityType.SILVERFISH) {
+        if (type == BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.tryParse("minecraft:silverfish"))) {
             var speed = mob.getAttribute(Attributes.MOVEMENT_SPEED);
             if (speed != null) {
                 speed.setBaseValue(speed.getBaseValue() * config.getSilverfishSpeedMultiplier());

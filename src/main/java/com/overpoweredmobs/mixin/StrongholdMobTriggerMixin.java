@@ -6,6 +6,7 @@ import com.overpoweredmobs.config.OverpoweredConfig;
 
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.level.ServerLevel;
@@ -42,7 +43,10 @@ public class StrongholdMobTriggerMixin {
         int count = config.getStrongholdMobCount();
 
         List<EntityType<?>> mobTypes = List.of(
-            EntityType.ZOMBIE, EntityType.SKELETON, EntityType.SPIDER, EntityType.CREEPER
+            BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.tryParse("minecraft:zombie")),
+            BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.tryParse("minecraft:skeleton")),
+            BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.tryParse("minecraft:spider")),
+            BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.tryParse("minecraft:creeper"))
         );
 
         for (int i = 0; i < count; i++) {
