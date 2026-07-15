@@ -3,7 +3,7 @@ package com.overpoweredmobs.mixin;
 import com.overpoweredmobs.OverpoweredMobs;
 import com.overpoweredmobs.config.OverpoweredConfig;
 
-import net.minecraft.world.entity.EntityReference;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(IronGolem.class)
+@Mixin(Mob.class)
 public class IronGolemMixin {
 
     @Shadow
@@ -27,7 +27,7 @@ public class IronGolemMixin {
 
     @Inject(method = "registerGoals", at = @At("HEAD"))
     private void onRegisterGoals(CallbackInfo ci) {
-        IronGolem golem = (IronGolem) (Object) this;
+        if (!(((Object) this) instanceof IronGolem golem)) return;
         OverpoweredConfig config = OverpoweredMobs.getConfig();
         if (!config.isEnableAngryGolems()) return;
 
