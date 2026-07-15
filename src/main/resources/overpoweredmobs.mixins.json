@@ -8,8 +8,6 @@
         "DropMultiplierMixin",
         "PinataDespawnMixin",
         "CreeperAccessor",
-        "FencePlacementMixin",
-        "FenceGuardMixin",
         "AggroSpeedMixin",
         "LargeFireballMixin",
         "GhastChargeMixin",

@@ -36,13 +36,12 @@ public class AggroSpeedMixin {
         if (nearest == null) return;
 
         double dist = mob.distanceTo(nearest);
-        if (dist > config.getAggroSlowRange()) {
-            int amplifier = (int) Math.round((config.getAggroSpeedMultiplier() - 1.0) / 0.2);
-            if (amplifier < 0) amplifier = 0;
-            mob.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, amplifier, false, false, false));
-        } else {
-            mob.removeEffect(MobEffects.SPEED);
-        }
+        double mult = dist > config.getAggroSlowRange()
+            ? config.getAggroSpeedMultiplier()
+            : config.getAggroCloseSpeedMultiplier();
+        int amplifier = (int) Math.round((mult - 1.0) / 0.2);
+        if (amplifier < 0) amplifier = 0;
+        mob.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, amplifier, false, false, false));
     }
 
     @Unique

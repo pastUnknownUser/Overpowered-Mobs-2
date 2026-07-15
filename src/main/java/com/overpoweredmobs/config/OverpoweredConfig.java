@@ -35,7 +35,8 @@ public class OverpoweredConfig {
     private double chargedCreeperChance = 1.0;
     private boolean enableAggro = true;
     private double aggroFollowRange = 128.0;
-    private double aggroSpeedMultiplier = 3.0;
+    private double aggroSpeedMultiplier = 1.75;
+    private double aggroCloseSpeedMultiplier = 2.25;
     private double aggroSlowRange = 10.0;
     private double rangedAttackSpeedMultiplier = 2.0;
     private double ghastExplosionMultiplier = 3.0;
@@ -102,6 +103,7 @@ public class OverpoweredConfig {
     public boolean isEnableAggro() { return enableAggro; }
     public double getAggroFollowRange() { return aggroFollowRange; }
     public double getAggroSpeedMultiplier() { return aggroSpeedMultiplier; }
+    public double getAggroCloseSpeedMultiplier() { return aggroCloseSpeedMultiplier; }
     public double getAggroSlowRange() { return aggroSlowRange; }
     public double getRangedAttackSpeedMultiplier() { return rangedAttackSpeedMultiplier; }
     public double getGhastExplosionMultiplier() { return ghastExplosionMultiplier; }

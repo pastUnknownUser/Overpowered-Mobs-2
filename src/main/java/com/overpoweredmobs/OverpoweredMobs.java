@@ -5,7 +5,6 @@ import com.overpoweredmobs.config.OverpoweredConfig;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -115,8 +114,6 @@ public class OverpoweredMobs implements ModInitializer {
     public void onInitialize() {
         OverpoweredMobsLogger.init(FabricLoader.getInstance().getGameDir());
         loadConfig();
-        FenceZoneManager.load();
-
         CommandRegistrationCallback.EVENT.register((dispatcher, commandBuildContext, commandSelection) ->
             OPMCommand.register(dispatcher)
         );
@@ -169,10 +166,6 @@ public class OverpoweredMobs implements ModInitializer {
                 zombie.getX(), zombie.getY() + 1, zombie.getZ(),
                 30, 1.5, 1.5, 1.5, 0.5);
         });
-
-        PlayerBlockBreakEvents.AFTER.register((level, player, pos, state, blockEntity) ->
-            FenceZoneManager.onFenceBroken(level, pos, state)
-        );
 
         ServerTickEvents.START_LEVEL_TICK.register(BossBarManager::onWorldTick);
 
