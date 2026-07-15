@@ -23,8 +23,7 @@
     ],
     "accessors": [
         "MobAccessor",
-        "LargeFireballAccessor",
-        "WolfAccessor"
+        "LargeFireballAccessor"
     ],
     "injectors": {
         "defaultRequire": 1
