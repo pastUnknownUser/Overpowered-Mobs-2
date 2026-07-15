@@ -51,9 +51,13 @@ jar {
         rename { "${it}_${project.archivesBaseName}" }
     }
     doLast {
+        def modsDir = file("/Users/evanchubbuck/Movies/fabric test server/mods/")
+        modsDir.listFiles()
+            ?.findAll { it.name.startsWith("overpoweredmobs-") && it.name != archiveFile.get().asFile.name }
+            ?.each { it.delete() }
         copy {
             from archiveFile
-            into "/Users/evanchubbuck/Movies/fabric test server/mods/"
+            into modsDir
         }
     }
 }
