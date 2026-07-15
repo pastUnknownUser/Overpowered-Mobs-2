@@ -18,8 +18,7 @@
         "RabbitMixin",
         "StrongholdMobTriggerMixin",
         "GiantAIMixin",
-        "WolfMixin",
-        "IronGolemMixin"
+        "WolfMixin"
     ],
     "accessors": [
         "MobAccessor",
