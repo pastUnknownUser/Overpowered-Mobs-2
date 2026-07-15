@@ -42,16 +42,17 @@ public class MobAttributesMixin {
 
         OverpoweredConfig config = OverpoweredMobs.getConfig();
 
-        if (mob instanceof Creeper creeper) {
-            if (config.isTestMode() || mob.getRandom().nextDouble() < config.getChargedCreeperChance()) {
-                CreeperHelper.setPowered(creeper);
-            }
-        }
         double effectiveSpawnChance = config.getSpawnChanceFor(mob.getType());
         if (!config.isTestMode() && mob.getRandom().nextDouble() >= effectiveSpawnChance) {
             OverpoweredMobsLogger.info("  -> horde mode (spawnChance roll failed)");
             applyHordeBuffs(mob, config);
             return;
+        }
+
+        if (mob instanceof Creeper creeper) {
+            if (config.isTestMode() || mob.getRandom().nextDouble() < config.getChargedCreeperChance()) {
+                CreeperHelper.setPowered(creeper);
+            }
         }
 
         OverpoweredMobs.applyBoosts(mob);
