@@ -106,7 +106,7 @@ A Fabric mod for Minecraft 26.1.2 / 26.2 that turns hostile mobs into formidable
 
 ## Commands
 
-All `/opm` commands require **operator** (moderator+) permission.
+All `/opm` commands require **operator** permission.
 
 | Command                                | Description                      |
 |----------------------------------------|----------------------------------|
