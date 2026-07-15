@@ -8,7 +8,6 @@
         "DropMultiplierMixin",
         "PinataDespawnMixin",
         "CreeperAccessor",
-        "AggroSpeedMixin",
         "LargeFireballMixin",
         "GhastChargeMixin",
         "PiglinHiveMixin",

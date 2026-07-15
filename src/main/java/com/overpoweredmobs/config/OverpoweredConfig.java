@@ -35,13 +35,14 @@ public class OverpoweredConfig {
     private double chargedCreeperChance = 1.0;
     private boolean enableAggro = true;
     private double aggroFollowRange = 128.0;
-    private double aggroSpeedMultiplier = 1.75;
-    private double aggroCloseSpeedMultiplier = 2.25;
+    private boolean enableDistanceSpeed = true;
+    private double aggroSpeedMultiplier = 1.0;
+    private double aggroCloseSpeedMultiplier = 1.0;
     private double aggroSlowRange = 10.0;
     private double rangedAttackSpeedMultiplier = 2.0;
     private double ghastExplosionMultiplier = 3.0;
     private double piglinBruteGearChance = 0.5;
-    private double silverfishSpeedMultiplier = 2.0;
+    private double silverfishSpeedMultiplier = 1.0;
     private double shulkerLevitationDurationMultiplier = 2.0;
     private boolean enableEvilBunnies = true;
     private boolean enablePiglinHive = true;
@@ -64,7 +65,7 @@ public class OverpoweredConfig {
         new CavalryEntry("minecraft:parched", "minecraft:skeleton_horse", 0.2, false)
     );
     private double spawnChance = 0.05;
-    private double hordeSpeedMultiplier = 1.3;
+    private double hordeSpeedMultiplier = 1.0;
     private double hordeFollowRangeMultiplier = 3.0;
     @SerializedName("zombiePi\u00F1ataChance")
     private double zombiePinataChance = 0.01;
@@ -100,6 +101,7 @@ public class OverpoweredConfig {
     public boolean isEnableMobNames() { return enableMobNames; }
     public boolean isEnableAlertSound() { return enableAlertSound; }
     public double getChargedCreeperChance() { return chargedCreeperChance; }
+    public boolean isEnableDistanceSpeed() { return enableDistanceSpeed; }
     public boolean isEnableAggro() { return enableAggro; }
     public double getAggroFollowRange() { return aggroFollowRange; }
     public double getAggroSpeedMultiplier() { return aggroSpeedMultiplier; }
@@ -199,7 +201,7 @@ public class OverpoweredConfig {
     public static class MobConfig {
         private double healthMultiplier = 2.0;
         private double damageMultiplier = 2.0;
-        private double speedMultiplier = 1.5;
+        private double speedMultiplier = 1.0;
         private double armorMultiplier = 2.0;
         private double followRangeMultiplier = 2.0;
         private double xpMultiplier = 3.0;

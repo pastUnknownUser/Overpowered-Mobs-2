@@ -2,7 +2,7 @@
 
 A Fabric mod for Minecraft 26.2 that turns hostile mobs into formidable enemies with boosted stats, OP enchanted gear, charged creepers, cavalry mounts, boss bars, and more — all using only vanilla items for full client compatibility.
 
-**Current version: 0.2.2**
+**Current version: 0.3.0**
 
 ## Features
 
@@ -30,7 +30,7 @@ A Fabric mod for Minecraft 26.2 that turns hostile mobs into formidable enemies 
 - **Parched** — Desert skeleton variant gets a bow like other skeletons
 
 ### Aggression & Awareness
-- **Aggro Rush System** — Boosted mobs get speed boost when far from players
+- **Distance Speed System** — Boosted overworld mobs move faster the farther they are from the player (Deogen-style)
 - **Alert Sound** — Wither spawn sound plays when a boosted equippable mob spawns near a player
 - **Boss Bar** — Per-player boss bar tracking the nearest boosted mob's HP (color-coded)
 - **Mob Name Tags** — Boosted mobs display a red `⚡ Overpowered {MobName}` name tag
@@ -54,7 +54,7 @@ A Fabric mod for Minecraft 26.2 that turns hostile mobs into formidable enemies 
 |-----------------|---------|
 | Health          | 2.0×    |
 | Damage          | 2.0×    |
-| Speed           | 1.5×    |
+| Speed           | 1.0×    |
 | Armor           | 2.0×    |
 | Follow Range    | 2.0×    |
 | XP              | 3.0×    |

@@ -2,6 +2,7 @@ package com.overpoweredmobs.mixin;
 
 import com.overpoweredmobs.CavalryAIGoal;
 import com.overpoweredmobs.CreeperHelper;
+import com.overpoweredmobs.DistanceSpeedGoal;
 import com.overpoweredmobs.EquipmentHelper;
 import com.overpoweredmobs.OverpoweredMobs;
 import com.overpoweredmobs.OverpoweredMobsLogger;
@@ -16,6 +17,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.monster.Creeper;
@@ -57,6 +59,12 @@ public class MobAttributesMixin {
         OverpoweredMobs.applyBoosts(mob);
 
         if (level instanceof ServerLevel serverLevel) {
+            if (config.isEnableDistanceSpeed()
+                && serverLevel.dimension().identifier().toString().equals("minecraft:overworld")
+                && (EquipmentHelper.isEquippable(mob.getType()) || mob instanceof Creeper)) {
+                mob.getGoalSelector().addGoal(3, new DistanceSpeedGoal(mob));
+            }
+
             if (config.isEnableAlertSound() && EquipmentHelper.isEquippable(mob.getType())) {
                 double rangeSq = config.getBossBarRange() * config.getBossBarRange();
                 if (OverpoweredMobs.isHostileNearby(serverLevel, mob, rangeSq)) {
