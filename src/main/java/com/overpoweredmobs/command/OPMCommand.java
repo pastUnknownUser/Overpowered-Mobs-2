@@ -10,10 +10,16 @@ import com.overpoweredmobs.config.OverpoweredConfig;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.permissions.Permissions;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Map;
 
@@ -36,6 +42,10 @@ public class OPMCommand {
                 .executes(OPMCommand::executeReset))
             .then(Commands.literal("test")
                 .executes(OPMCommand::executeTest))
+            .then(Commands.literal("cavalry")
+                .then(Commands.argument("rider", StringArgumentType.word())
+                    .then(Commands.argument("mount", StringArgumentType.word())
+                        .executes(OPMCommand::executeCavalry))))
         );
     }
 
@@ -112,6 +122,51 @@ public class OPMCommand {
         ctx.getSource().sendSuccess(() ->
             Component.literal("Test mode " + (now ? "enabled" : "disabled") + " — all random chances forced to 100%"), true);
         OverpoweredMobsLogger.info("Test mode " + (now ? "enabled" : "disabled"));
+        return 1;
+    }
+
+    private static int executeCavalry(CommandContext<CommandSourceStack> ctx) {
+        String riderStr = StringArgumentType.getString(ctx, "rider");
+        String mountStr = StringArgumentType.getString(ctx, "mount");
+
+        EntityType<?> riderType = findEntityType(riderStr);
+        if (riderType == null) {
+            ctx.getSource().sendFailure(Component.literal("Unknown entity type: " + riderStr));
+            return 0;
+        }
+        EntityType<?> mountType = findEntityType(mountStr);
+        if (mountType == null) {
+            ctx.getSource().sendFailure(Component.literal("Unknown entity type: " + mountStr));
+            return 0;
+        }
+
+        if (!(ctx.getSource().getLevel() instanceof ServerLevel level)) return 0;
+        Vec3 pos = ctx.getSource().getPosition();
+        DifficultyInstance difficulty = level.getCurrentDifficultyAt(BlockPos.containing(pos));
+
+        Mob mount = (Mob) mountType.create(level, EntitySpawnReason.COMMAND);
+        if (mount == null) {
+            ctx.getSource().sendFailure(Component.literal("Failed to create mount"));
+            return 0;
+        }
+        mount.setPos(pos);
+        mount.finalizeSpawn(level, difficulty, EntitySpawnReason.COMMAND, null);
+        mount.addTag("opm_cavalry_mount");
+        level.addFreshEntity(mount);
+
+        Mob rider = (Mob) riderType.create(level, EntitySpawnReason.COMMAND);
+        if (rider == null) {
+            ctx.getSource().sendFailure(Component.literal("Failed to create rider"));
+            return 0;
+        }
+        rider.setPos(pos);
+        rider.finalizeSpawn(level, difficulty, EntitySpawnReason.COMMAND, null);
+        level.addFreshEntity(rider);
+
+        rider.startRiding(mount);
+
+        ctx.getSource().sendSuccess(() ->
+            Component.literal("Spawned " + riderStr + " riding " + mountStr), true);
         return 1;
     }
 
