@@ -32,7 +32,7 @@ public class OverpoweredConfig {
     private double bossBarRange = 32.0;
     private boolean enableMobNames = true;
     private boolean enableAlertSound = true;
-    private double chargedCreeperChance = 0.2;
+    private double chargedCreeperChance = 1.0;
     private boolean enableAggro = true;
     private double aggroFollowRange = 128.0;
     private double aggroSpeedMultiplier = 3.0;
