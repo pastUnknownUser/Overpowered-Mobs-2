@@ -1,22 +1,49 @@
 # Overpowered Mobs
 
-A Fabric mod for Minecraft 26.1.2+ that turns hostile mobs into formidable enemies with boosted stats, OP enchanted gear, and charged creepers — all using only vanilla items for full vanilla client compatibility.
+A Fabric mod for Minecraft 26.1.2 / 26.2 that turns hostile mobs into formidable enemies with boosted stats, OP enchanted gear, charged creepers, cavalry mounts, boss bars, and more — all using only vanilla items for full client compatibility.
+
+**Current version: 0.2.2**
 
 ## Features
 
-- **Mob Boosting** — Multiplied health, damage, speed, armor, follow range, and XP for all hostile mobs
-- **Dynamic Drop Multiplier** — 1.2× drops without armor, 3× drops with armor equipped
-- **Horde Mode** — Mob that fail the spawn roll get 1.3× speed + 3× follow range
+### Core
+- **Mob Boosting** — Multiplied health, damage, speed, armor, and follow range for hostile mobs
+- **Horde Mode** — Mobs that fail the spawn roll get 1.3× speed + 3× follow range
+- **Dynamic Drop Multiplier** — 1.2× drops without armor, 3× with armor
 - **Dimension Multipliers** — Per-dimension stat scaling (e.g., nerf overworld, buff nether)
-- **OP Enchanted Gear** — Hostile mobs spawn with full netherite armor (Protection X) and OP weapons — gear never drops from mobs
+- **Fence Zone System** — Auto-detects player-built enclosures; boosted mobs get teleported out
+
+### Gear & Combat
+- **OP Enchanted Gear** — Equippable mobs get full netherite armor (Protection X) + OP weapons — gear never drops
 - **Custom Weapon Config** — Per-mob weapon + enchantment overrides (Drowned defaults to Trident + Impaling X)
-- **Charged Creepers** — All creepers spawn visually charged with doubled explosion radius
-- **Cavalry Mounts** — Hostile mobs can spawn riding mounts (zombie on chicken, creeper on phantom, wither skeleton on ghast)
-- **Zombie Piñata** — Zombies explode into baby zombies on death (player kills only, 1% base chance, 75% when densely packed) with firework sound and particle burst
-- **Feature Toggles** — `enableGear`, `enableCavalry`, `enablePinata` flags in config
-- **No Mod Required on Client** — Uses only vanilla items with enchantments; vanilla clients connect without issues
-- **Fully Configurable** — JSON config with per-mob-type overrides
-- **Commands** — `/opm` suite for runtime control (operator only)
+- **Piglin Gold Armor** — Piglins get gold armor instead of netherite; brutes have 50% gear chance
+- **Ranged Attack Speed** — Skeletons, strays, bogged, and parched shoot faster
+
+### Mobs
+- **Charged Creepers** — Configurable chance (default 100%) for creepers to spawn visually charged
+- **Cavalry Mounts** — Hostile mobs can spawn riding mounts (zombie on chicken, creeper on phantom, wither skeleton on ghast, skeleton types on skeleton horses)
+- **Skeleton Horsemen** — Skeletons, strays, bogged, and parched can spawn on skeleton horses (20%)
+- **Zombie Piñata** — Zombies explode into baby zombies on player kill (1% base, 75% when densely packed)
+- **Evil Bunnies** — All rabbits spawn as the killer variant
+- **Giant AI** — Giants now have attack, look, wander, and random look goals
+- **Silverfish Speed** — Extra speed multiplier on top of normal boost
+- **Shulker Levitation** — Doubled levitation duration from shulker bullets
+- **Parched** — Desert skeleton variant gets a bow like other skeletons
+
+### Aggression & Awareness
+- **Aggro Rush System** — Boosted mobs get speed boost when far from players
+- **Alert Sound** — Wither spawn sound plays when a boosted equippable mob spawns near a player
+- **Boss Bar** — Per-player boss bar tracking the nearest boosted mob's HP (color-coded)
+- **Mob Name Tags** — Boosted mobs display a red `⚡ Overpowered {MobName}` name tag
+- **Piglin Hivemind** — Piglins periodically anger nearby piglins (10% chance per second)
+- **Angry Wolves** — All wolves spawn permanently angry at the nearest player
+- **Water-resistant Endermen** — Endermen no longer take damage from water or rain
+
+### Events
+- **Stronghold Mob Wave** — Entering a stronghold (follow_ender_eye advancement) spawns a wave of boosted mobs
+
+### Commands
+- **Test Mode** — Forces all random chances to 100% for testing
 
 ## Config
 
@@ -40,9 +67,21 @@ A Fabric mod for Minecraft 26.1.2+ that turns hostile mobs into formidable enemi
   "enableGear": true,
   "enableCavalry": true,
   "enablePinata": true,
-  "defaults": { "healthMultiplier": 2.0, "damageMultiplier": 2.0, ... },
+  "enableBossBar": true,
+  "enableMobNames": true,
+  "enableAlertSound": true,
+  "enableAggro": true,
+  "enableEvilBunnies": true,
+  "enablePiglinHive": true,
+  "enableStrongholdMobs": true,
+  "enableAngryWolves": true,
+  "enableWaterEndermen": true,
+  "chargedCreeperChance": 1.0,
+  "spawnChance": 0.05,
+  "defaults": { ... },
   "mobs": {
-    "minecraft:zombie": { "healthMultiplier": 3.0 },
+    "minecraft:pillager": { "spawnChance": 0.15 },
+    "minecraft:creeper": { "spawnChance": 0.2 },
     "minecraft:drowned": {
       "weapon": "minecraft:trident",
       "weaponEnchantments": { "minecraft:impaling": 10 }
@@ -54,7 +93,11 @@ A Fabric mod for Minecraft 26.1.2+ that turns hostile mobs into formidable enemi
   "cavalry": [
     { "rider": "minecraft:zombie", "mount": "minecraft:chicken", "chance": 0.15, "baby": true },
     { "rider": "minecraft:creeper", "mount": "minecraft:phantom", "chance": 0.03, "baby": false },
-    { "rider": "minecraft:wither_skeleton", "mount": "minecraft:ghast", "chance": 0.03, "baby": false }
+    { "rider": "minecraft:wither_skeleton", "mount": "minecraft:ghast", "chance": 0.03, "baby": false },
+    { "rider": "minecraft:skeleton", "mount": "minecraft:skeleton_horse", "chance": 0.2, "baby": false },
+    { "rider": "minecraft:stray", "mount": "minecraft:skeleton_horse", "chance": 0.2, "baby": false },
+    { "rider": "minecraft:bogged", "mount": "minecraft:skeleton_horse", "chance": 0.2, "baby": false },
+    { "rider": "minecraft:parched", "mount": "minecraft:skeleton_horse", "chance": 0.2, "baby": false }
   ],
   "zombiePiñataChance": 0.01,
   "zombiePiñataCount": 2
@@ -65,13 +108,14 @@ A Fabric mod for Minecraft 26.1.2+ that turns hostile mobs into formidable enemi
 
 All `/opm` commands require **operator** (moderator+) permission.
 
-| Command                        | Description                  |
-|--------------------------------|------------------------------|
-| `/opm status`                  | Show current multipliers     |
-| `/opm set <mob> <attr> <val>`  | Set a multiplier             |
-| `/opm reload`                  | Reload config from disk      |
-| `/opm reset`                   | Reset config to defaults     |
-| `/opm test`                    | Toggle test mode (100% odds) |
+| Command                                | Description                      |
+|----------------------------------------|----------------------------------|
+| `/opm status`                          | Show current multipliers         |
+| `/opm set <mob> <attr> <value>`        | Set a multiplier                 |
+| `/opm reload`                          | Reload config from disk          |
+| `/opm reset`                           | Reset config to defaults         |
+| `/opm test`                            | Toggle test mode (100% odds)     |
+| `/opm cavalry <rider> <mount>`         | Spawn a rider on a mount for testing |
 
 ## Build
 
@@ -80,7 +124,9 @@ All `/opm` commands require **operator** (moderator+) permission.
 ./gradlew :26.2:build       # build for 26.2
 ```
 
-Output: `build/libs/overpoweredmobs-<version>+mc<mc_version>.jar`
+Output: `build/libs/overpoweredmobs-<version>+mc<mc_version>-b<build_number>.jar`
+
+The JAR includes a build number from the git commit count. Old JARs are automatically cleaned from the test server mods folder on each build.
 
 ## Requirements
 
