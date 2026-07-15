@@ -1,29 +1,9 @@
 pluginManagement {
     repositories {
         maven { url = "https://maven.fabricmc.net/" }
-        maven {
-            url = "https://jitpack.io"
-            content { includeGroupAndSubgroups("com.github") }
-        }
         mavenCentral()
         gradlePluginPortal()
-    }
-    resolutionStrategy {
-        eachPlugin {
-            switch (requested.id.id) {
-                case "com.replaymod.preprocess":
-                    useModule("com.github.Fallen-Breath:preprocessor:${requested.version}")
-                    break
-            }
-        }
     }
 }
 
 rootProject.name = "overpoweredmobs"
-
-def versionDirs = ["26.1.2", "26.2"]
-versionDirs.forEach { v ->
-    include(":$v")
-    project(":$v").projectDir = file("versions/$v")
-    project(":$v").buildFileName = "../../common.gradle"
-}

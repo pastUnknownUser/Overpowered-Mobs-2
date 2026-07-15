@@ -25,27 +25,41 @@ import java.util.Set;
 public final class EquipmentHelper {
     private static final Set<EntityType<?>> NO_EQUIP_TYPES = buildNoEquipTypes();
 
+    private static EntityType<?> et(String id) {
+        return BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.tryParse(id));
+    }
+
     private static Set<EntityType<?>> buildNoEquipTypes() {
         return Set.of(
-            EntityType.CREEPER,
-            EntityType.SPIDER,
-            EntityType.CAVE_SPIDER,
-            EntityType.SLIME,
-            EntityType.MAGMA_CUBE,
-            EntityType.ENDERMAN,
-            EntityType.SILVERFISH,
-            EntityType.ENDERMITE,
-            EntityType.BLAZE,
-            EntityType.GHAST,
-            EntityType.GUARDIAN,
-            EntityType.ELDER_GUARDIAN,
-            EntityType.WITCH,
-            EntityType.PHANTOM
+            et("minecraft:creeper"),
+            et("minecraft:spider"),
+            et("minecraft:cave_spider"),
+            et("minecraft:slime"),
+            et("minecraft:magma_cube"),
+            et("minecraft:enderman"),
+            et("minecraft:silverfish"),
+            et("minecraft:endermite"),
+            et("minecraft:blaze"),
+            et("minecraft:ghast"),
+            et("minecraft:guardian"),
+            et("minecraft:elder_guardian"),
+            et("minecraft:witch"),
+            et("minecraft:phantom")
         );
     }
 
     public static boolean isEquippable(EntityType<?> type) {
         return !NO_EQUIP_TYPES.contains(type);
+    }
+
+    private static final Set<EntityType<?>> PIGLIN_TYPES = Set.of(
+        et("minecraft:piglin"),
+        et("minecraft:piglin_brute"),
+        et("minecraft:zombified_piglin")
+    );
+
+    public static boolean isPiglin(EntityType<?> type) {
+        return PIGLIN_TYPES.contains(type);
     }
 
     public static void equipOPGear(Mob mob, RegistryAccess registryAccess) {
@@ -57,7 +71,7 @@ public final class EquipmentHelper {
         if (!isPinata) {
             if (isPiglin(mob.getType())) {
                 OverpoweredConfig config = OverpoweredMobs.getConfig();
-                if (mob.getType() == EntityType.PIGLIN_BRUTE && mob.getRandom().nextDouble() >= config.getPiglinBruteGearChance()) {
+                if (mob.getType() == et("minecraft:piglin_brute") && mob.getRandom().nextDouble() >= config.getPiglinBruteGearChance()) {
                     // skip gear for brute
                 } else {
                     setSlot(mob, EquipmentSlot.HEAD, enchanted(enchants, Items.GOLDEN_HELMET, Enchantments.PROTECTION, 10));
@@ -95,16 +109,11 @@ public final class EquipmentHelper {
         }
     }
 
-    private static final Set<EntityType<?>> PIGLIN_TYPES = Set.of(
-        EntityType.PIGLIN, EntityType.PIGLIN_BRUTE, EntityType.ZOMBIFIED_PIGLIN
-    );
-
     public static boolean isRangedMob(EntityType<?> type) {
-        return type == EntityType.SKELETON || type == EntityType.STRAY || type == EntityType.BOGGED || type == EntityType.PARCHED;
-    }
-
-    public static boolean isPiglin(EntityType<?> type) {
-        return PIGLIN_TYPES.contains(type);
+        return type == et("minecraft:skeleton")
+            || type == et("minecraft:stray")
+            || type == et("minecraft:bogged")
+            || type == et("minecraft:parched");
     }
 
     private static void setSlot(Mob mob, EquipmentSlot slot, ItemStack stack) {

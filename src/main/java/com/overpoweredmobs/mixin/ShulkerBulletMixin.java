@@ -5,9 +5,9 @@ import com.overpoweredmobs.config.OverpoweredConfig;
 
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ShulkerBullet;
+import net.minecraft.world.phys.EntityHitResult;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,8 +18,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ShulkerBulletMixin {
 
     @Inject(method = "onHitEntity", at = @At("TAIL"))
-    private void onHitEntity(Entity target, CallbackInfo ci) {
-        if (!(target instanceof LivingEntity living)) return;
+    private void onHitEntity(EntityHitResult result, CallbackInfo ci) {
+        if (!(result.getEntity() instanceof LivingEntity living)) return;
 
         OverpoweredConfig config = OverpoweredMobs.getConfig();
         double mult = config.getShulkerLevitationDurationMultiplier();

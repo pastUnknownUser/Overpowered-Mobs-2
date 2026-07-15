@@ -1,38 +1,70 @@
 plugins {
     id "maven-publish"
-    id "net.fabricmc.fabric-loom" version "1.17.14" apply false
-    id "com.replaymod.preprocess" version "c5abb4fb12"
+    id "net.fabricmc.fabric-loom" version "1.17.14"
 }
 
-preprocess {
-    strictExtraMappings = false
+def getGitCommitCount() {
+    def process = "git rev-list --count HEAD".execute()
+    process.waitFor()
+    return process.text.trim()
+}
 
-    def mc2601 = createNode("26.1.2", 26_01_02, "")
-    def mc2602 = createNode("26.2", 26_02_00, "")
+version = project.mod_version + "+mc" + project.minecraft_version + "-b" + getGitCommitCount()
+group = project.maven_group
 
-    mc2601.link(mc2602, null)
+base {
+    archivesName = project.archives_base_name
+}
 
-    for (final def node in getNodes()) {
-        findProject(node.project).ext.mcVersion = node.mcVersion
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+processResources {
+    inputs.property "version", project.mod_version
+    filteringCharset "UTF-8"
+    filesMatching("fabric.mod.json") {
+        expand "version": project.mod_version,
+               "minecraft_dependency": project.minecraft_dependency
     }
 }
 
-tasks.register("buildAndGather") {
-    subprojects {
-        dependsOn project.tasks.named("build").get()
+java {
+    withSourcesJar()
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
     }
-    doFirst {
-        def buildLibs = { p -> p.layout.buildDirectory.dir("libs").get().asFile }
-        delete fileTree(buildLibs(rootProject)) { include "*" }
-        subprojects {
-            copy {
-                from(buildLibs(project)) {
-                    include "*.jar"
-                    exclude "*-dev.jar", "*-sources.jar", "*-shadow.jar"
-                }
-                into buildLibs(rootProject)
-                duplicatesStrategy = DuplicatesStrategy.INCLUDE
-            }
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}" }
+    }
+    doLast {
+        def modsDir = file("/Users/evanchubbuck/Movies/fabric test server/26.2/mods/")
+        modsDir.listFiles()
+            ?.findAll { it.name.startsWith("overpoweredmobs-") && it.name != archiveFile.get().asFile.name }
+            ?.each { it.delete() }
+        copy {
+            from archiveFile
+            into modsDir
         }
+    }
+}
+
+publishing {
+    publications {
+        create("mavenJava", MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
     }
 }

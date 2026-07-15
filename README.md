@@ -1,6 +1,6 @@
 # Overpowered Mobs
 
-A Fabric mod for Minecraft 26.1.2 / 26.2 that turns hostile mobs into formidable enemies with boosted stats, OP enchanted gear, charged creepers, cavalry mounts, boss bars, and more — all using only vanilla items for full client compatibility.
+A Fabric mod for Minecraft 26.2 that turns hostile mobs into formidable enemies with boosted stats, OP enchanted gear, charged creepers, cavalry mounts, boss bars, and more — all using only vanilla items for full client compatibility.
 
 **Current version: 0.2.2**
 
@@ -11,7 +11,6 @@ A Fabric mod for Minecraft 26.1.2 / 26.2 that turns hostile mobs into formidable
 - **Horde Mode** — Mobs that fail the spawn roll get 1.3× speed + 3× follow range
 - **Dynamic Drop Multiplier** — 1.2× drops without armor, 3× with armor
 - **Dimension Multipliers** — Per-dimension stat scaling (e.g., nerf overworld, buff nether)
-- **Fence Zone System** — Auto-detects player-built enclosures; boosted mobs get teleported out
 
 ### Gear & Combat
 - **OP Enchanted Gear** — Equippable mobs get full netherite armor (Protection X) + OP weapons — gear never drops
@@ -35,7 +34,7 @@ A Fabric mod for Minecraft 26.1.2 / 26.2 that turns hostile mobs into formidable
 - **Alert Sound** — Wither spawn sound plays when a boosted equippable mob spawns near a player
 - **Boss Bar** — Per-player boss bar tracking the nearest boosted mob's HP (color-coded)
 - **Mob Name Tags** — Boosted mobs display a red `⚡ Overpowered {MobName}` name tag
-- **Piglin Hivemind** — Piglins periodically anger nearby piglins (10% chance per second)
+- **Zombified Piglin Hivemind** — Zombified piglins periodically anger nearby piglins (10% chance per second)
 - **Angry Wolves** — All wolves spawn permanently angry at the nearest player
 - **Water-resistant Endermen** — Endermen no longer take damage from water or rain
 
@@ -120,17 +119,16 @@ All `/opm` commands require **operator** permission.
 ## Build
 
 ```bash
-./gradlew :26.1.2:build    # build for 26.1.2
-./gradlew :26.2:build       # build for 26.2
+./gradlew build
 ```
 
-Output: `build/libs/overpoweredmobs-<version>+mc<mc_version>-b<build_number>.jar`
+Output: `build/libs/overpoweredmobs-<version>+mc26.2-b<build_number>.jar`
 
 The JAR includes a build number from the git commit count. Old JARs are automatically cleaned from the test server mods folder on each build.
 
 ## Requirements
 
-- Minecraft 26.1.2 or 26.2
+- Minecraft 26.2
 - Fabric Loader 0.19.3+
 - Fabric API 0.154.2+
 - Java 25

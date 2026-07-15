@@ -5,7 +5,6 @@ import com.overpoweredmobs.config.OverpoweredConfig;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.projectile.hurtingprojectile.LargeFireball;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LargeFireball.class)
 public class LargeFireballMixin {
 
-    @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/LivingEntity;DDDLnet/minecraft/world/level/Level;)V", at = @At("RETURN"))
+    @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/phys/Vec3;I)V", at = @At("RETURN"))
     private void onInit(CallbackInfo ci) {
         LargeFireball fireball = (LargeFireball) (Object) this;
         Entity owner = fireball.getOwner();
