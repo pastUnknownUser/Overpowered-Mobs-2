@@ -60,9 +60,11 @@ public class MobAttributesMixin {
 
         if (level instanceof ServerLevel serverLevel) {
             if (config.isEnableDistanceSpeed()
-                && serverLevel.dimension().identifier().toString().equals("minecraft:overworld")
                 && (EquipmentHelper.isEquippable(mob.getType()) || mob instanceof Creeper)) {
-                mob.getGoalSelector().addGoal(3, new DistanceSpeedGoal(mob));
+                mob.getGoalSelector().addGoal(3, new DistanceSpeedGoal(mob,
+                    config.getAggroCloseSpeed(),
+                    config.getAggroFarSpeed(),
+                    config.getAggroSlowRange()));
             }
 
             if (config.isEnableAlertSound() && EquipmentHelper.isEquippable(mob.getType())) {

@@ -3,6 +3,7 @@ package com.overpoweredmobs;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -11,23 +12,10 @@ import java.util.EnumSet;
 
 public class DistanceSpeedGoal extends Goal {
 
-    private static final double FAR_THRESHOLD = 20.0;
-    private static final double MID_THRESHOLD = 10.0;
-    private static final double NEAR_THRESHOLD = 5.0;
-
-    private static final double FAR_SPEED = 3.0;
-    private static final double MID_SPEED = 2.0;
-    private static final double NEAR_SPEED = 1.5;
-    private static final double CLOSE_SPEED = 1.0;
-
     private static final int FAR_RECALC = 40;
-    private static final int MID_RECALC = 20;
-    private static final int NEAR_RECALC = 10;
     private static final int CLOSE_RECALC = 5;
 
     private static final float FAR_TURN = 4.0f;
-    private static final float MID_TURN = 8.0f;
-    private static final float NEAR_TURN = 12.0f;
     private static final float CLOSE_TURN = 15.0f;
 
     private static final double SMOOTHING = 0.15;
@@ -35,13 +23,19 @@ public class DistanceSpeedGoal extends Goal {
     private static final int STUCK_TICK_LIMIT = 20;
 
     private final Mob mob;
+    private final double closeSpeed;
+    private final double farSpeed;
+    private final double slowRange;
     private Vec3 lastPos;
     private int stuckTicks;
     private int recalcCounter;
-    private double currentSpeed = 1.0;
+    private double currentModifier = 1.0;
 
-    public DistanceSpeedGoal(Mob mob) {
+    public DistanceSpeedGoal(Mob mob, double closeSpeed, double farSpeed, double slowRange) {
         this.mob = mob;
+        this.closeSpeed = closeSpeed;
+        this.farSpeed = farSpeed;
+        this.slowRange = slowRange;
         this.lastPos = mob.position();
         setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
@@ -49,14 +43,14 @@ public class DistanceSpeedGoal extends Goal {
     @Override
     public boolean canUse() {
         if (!(mob.level() instanceof ServerLevel level)) return false;
-        Player nearest = level.getNearestPlayer(mob, FAR_THRESHOLD + 5.0);
+        Player nearest = level.getNearestPlayer(mob, slowRange + 5.0);
         return nearest != null && mob.isAlive();
     }
 
     @Override
     public boolean canContinueToUse() {
         if (!(mob.level() instanceof ServerLevel level)) return false;
-        Player nearest = level.getNearestPlayer(mob, FAR_THRESHOLD + 10.0);
+        Player nearest = level.getNearestPlayer(mob, slowRange + 10.0);
         return nearest != null && mob.isAlive();
     }
 
@@ -64,44 +58,28 @@ public class DistanceSpeedGoal extends Goal {
     public void tick() {
         if (!(mob.level() instanceof ServerLevel level)) return;
 
-        Player player = level.getNearestPlayer(mob, FAR_THRESHOLD + 10.0);
+        Player player = level.getNearestPlayer(mob, slowRange + 10.0);
         if (player == null) return;
 
         double dist = mob.distanceTo(player);
 
-        double targetSpeed;
-        int recalcInterval;
-        float turnRate;
+        double targetMps = (dist >= slowRange) ? farSpeed : closeSpeed;
+        double actualSpeed = mob.getAttributeValue(Attributes.MOVEMENT_SPEED);
+        double targetModifier = (actualSpeed > 0) ? targetMps / actualSpeed : 1.0;
 
-        if (dist >= FAR_THRESHOLD) {
-            targetSpeed = FAR_SPEED;
-            recalcInterval = FAR_RECALC;
-            turnRate = FAR_TURN;
-        } else if (dist >= MID_THRESHOLD) {
-            targetSpeed = MID_SPEED;
-            recalcInterval = MID_RECALC;
-            turnRate = MID_TURN;
-        } else if (dist >= NEAR_THRESHOLD) {
-            targetSpeed = NEAR_SPEED;
-            recalcInterval = NEAR_RECALC;
-            turnRate = NEAR_TURN;
-        } else {
-            targetSpeed = CLOSE_SPEED;
-            recalcInterval = CLOSE_RECALC;
-            turnRate = CLOSE_TURN;
-        }
+        currentModifier += (targetModifier - currentModifier) * SMOOTHING;
 
-        currentSpeed += (targetSpeed - currentSpeed) * SMOOTHING;
-
-        mob.getNavigation().setSpeedModifier(currentSpeed);
+        mob.getNavigation().setSpeedModifier(currentModifier);
 
         recalcCounter++;
         boolean stuck = checkStuck();
+        int recalcInterval = (dist >= slowRange) ? FAR_RECALC : CLOSE_RECALC;
         if (recalcCounter >= recalcInterval || stuck) {
             recalcCounter = 0;
-            mob.getNavigation().moveTo(player, currentSpeed);
+            mob.getNavigation().moveTo(player, currentModifier);
         }
 
+        float turnRate = (dist >= slowRange) ? FAR_TURN : CLOSE_TURN;
         capYaw(player, turnRate);
     }
 

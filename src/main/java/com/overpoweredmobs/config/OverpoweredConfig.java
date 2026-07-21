@@ -36,8 +36,8 @@ public class OverpoweredConfig {
     private boolean enableAggro = true;
     private double aggroFollowRange = 128.0;
     private boolean enableDistanceSpeed = true;
-    private double aggroSpeedMultiplier = 1.0;
-    private double aggroCloseSpeedMultiplier = 1.0;
+    private double aggroFarSpeed = 8.4;
+    private double aggroCloseSpeed = 5.6;
     private double aggroSlowRange = 10.0;
     private double rangedAttackSpeedMultiplier = 2.0;
     private double ghastExplosionMultiplier = 3.0;
@@ -104,8 +104,8 @@ public class OverpoweredConfig {
     public boolean isEnableDistanceSpeed() { return enableDistanceSpeed; }
     public boolean isEnableAggro() { return enableAggro; }
     public double getAggroFollowRange() { return aggroFollowRange; }
-    public double getAggroSpeedMultiplier() { return aggroSpeedMultiplier; }
-    public double getAggroCloseSpeedMultiplier() { return aggroCloseSpeedMultiplier; }
+    public double getAggroFarSpeed() { return aggroFarSpeed; }
+    public double getAggroCloseSpeed() { return aggroCloseSpeed; }
     public double getAggroSlowRange() { return aggroSlowRange; }
     public double getRangedAttackSpeedMultiplier() { return rangedAttackSpeedMultiplier; }
     public double getGhastExplosionMultiplier() { return ghastExplosionMultiplier; }

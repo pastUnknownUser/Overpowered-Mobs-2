@@ -30,7 +30,7 @@ A Fabric mod for Minecraft 26.2 that turns hostile mobs into formidable enemies 
 - **Parched** — Desert skeleton variant gets a bow like other skeletons
 
 ### Aggression & Awareness
-- **Distance Speed System** — Boosted overworld mobs move faster the farther they are from the player (Deogen-style)
+- **Distance Speed System** — Boosted mobs move faster the farther they are from the player (5.6 m/s close, 8.4 m/s far, configurable)
 - **Alert Sound** — Wither spawn sound plays when a boosted equippable mob spawns near a player
 - **Boss Bar** — Per-player boss bar tracking the nearest boosted mob's HP (color-coded)
 - **Mob Name Tags** — Boosted mobs display a red `⚡ Overpowered {MobName}` name tag
@@ -70,6 +70,10 @@ A Fabric mod for Minecraft 26.2 that turns hostile mobs into formidable enemies 
   "enableMobNames": true,
   "enableAlertSound": true,
   "enableAggro": true,
+  "enableDistanceSpeed": true,
+  "aggroCloseSpeed": 5.6,
+  "aggroFarSpeed": 8.4,
+  "aggroSlowRange": 10.0,
   "enableEvilBunnies": true,
   "enablePiglinHive": true,
   "enableStrongholdMobs": true,
