@@ -2,7 +2,7 @@
 
 A Fabric mod for Minecraft 26.2 that turns hostile mobs into formidable enemies with boosted stats, OP enchanted gear, charged creepers, cavalry mounts, boss bars, and more — all using only vanilla items for full client compatibility.
 
-**Current version: 0.3.0**
+**Current version: 0.3.1**
 
 ## Features
 
